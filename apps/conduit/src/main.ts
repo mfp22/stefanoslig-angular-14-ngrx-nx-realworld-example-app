@@ -49,33 +49,32 @@ bootstrapApplication(AppComponent, {
           },
           {
             path: 'home',
-            loadChildren: () => import('@realworld/home/src/lib/home.routes').then((home) => home.HOME_ROUTES),
+            loadChildren: () => import('@realworld/home/src/lib/home.routes').then(home => home.HOME_ROUTES),
           },
           {
             path: 'login',
-            loadComponent: () => import('@realworld/auth/feature-auth').then((m) => m.LoginComponent),
+            loadComponent: () => import('@realworld/auth/feature-auth').then(m => m.LoginComponent),
           },
           {
             path: 'register',
-            loadComponent: () => import('@realworld/auth/feature-auth').then((m) => m.RegisterComponent),
+            loadComponent: () => import('@realworld/auth/feature-auth').then(m => m.RegisterComponent),
           },
           {
             path: 'article',
-            loadChildren: () => import('@realworld/articles/article').then((m) => m.ARTICLE_ROUTES),
+            loadChildren: () => import('@realworld/articles/article').then(m => m.ARTICLE_ROUTES),
           },
           {
             path: 'settings',
             loadChildren: () =>
-              import('@realworld/settings/feature-settings').then((settings) => settings.SETTINGS_ROUTES),
+              import('@realworld/settings/feature-settings').then(settings => settings.SETTINGS_ROUTES),
           },
           {
             path: 'editor',
-            loadChildren: () =>
-              import('@realworld/articles/article-edit').then((article) => article.ARTICLE_EDIT_ROUTES),
+            loadChildren: () => import('@realworld/articles/article-edit').then(article => article.ARTICLE_EDIT_ROUTES),
           },
           {
             path: 'profile',
-            loadChildren: () => import('@realworld/profile/feature-profile').then((profile) => profile.PROFILE_ROUTES),
+            loadChildren: () => import('@realworld/profile/feature-profile').then(profile => profile.PROFILE_ROUTES),
           },
         ],
         {
@@ -97,4 +96,4 @@ bootstrapApplication(AppComponent, {
     { provide: API_URL, useValue: environment.api_url },
     ...rootInterceptors,
   ],
-}).catch((err) => console.log(err));
+}).catch(err => console.log(err));
