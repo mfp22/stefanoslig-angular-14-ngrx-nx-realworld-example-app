@@ -7,6 +7,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { adaptReducer, actionSanitizer, stateSanitizer } from '@state-adapt/core';
 import { AuthEffects, authFeature, TokenInterceptorService } from '@realworld/auth/data-access';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import {
@@ -87,9 +88,10 @@ bootstrapApplication(AppComponent, {
         auth: authFeature.reducer,
         errorHandler: errorHandlerFeature.reducer,
         ngrxForms: ngrxFormsFeature.reducer,
+        adapt: adaptReducer,
       }),
       EffectsModule.forRoot([ErrorHandlerEffects, AuthEffects, NgrxFormsEffects]),
-      !environment.production ? StoreDevtoolsModule.instrument() : [],
+      !environment.production ? StoreDevtoolsModule.instrument({ actionSanitizer, stateSanitizer }) : [],
       StoreRouterConnectingModule.forRoot(),
     ),
     { provide: API_URL, useValue: environment.api_url },
