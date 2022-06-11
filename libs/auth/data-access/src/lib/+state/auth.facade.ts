@@ -57,7 +57,7 @@ export class AuthFacade {
     toSource('[Auth] logout$'),
   );
 
-  store = this.adapt.init(['auth2', authAdapter, authInitialState], {
+  store = this.adapt.init(['auth', authAdapter, authInitialState], {
     receiveUser: [this.userRequest.success$, this.loginOrRegisterSuccess$],
     setInProgress: [this.loginRequest$, this.registerRequest$],
     resetStatus: [this.loginOrRegisterSuccess$, this.loginOrRegisterError$],
