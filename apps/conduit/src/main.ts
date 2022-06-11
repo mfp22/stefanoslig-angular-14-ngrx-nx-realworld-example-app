@@ -7,8 +7,16 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { adaptReducer, actionSanitizer, stateSanitizer } from '@state-adapt/core';
-import { AuthEffects, authFeature, TokenInterceptorService } from '@realworld/auth/data-access';
+import {
+  actionSanitizer,
+  stateSanitizer,
+  PatchState,
+  CommonAction,
+  AdaptModel,
+  isPatchState,
+  updatePaths,
+} from '@state-adapt/core';
+import { TokenInterceptorService } from '@realworld/auth/data-access';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import {
   ErrorHandlerEffects,
@@ -84,12 +92,11 @@ bootstrapApplication(AppComponent, {
         },
       ),
       StoreModule.forRoot({
-        auth: authFeature.reducer,
         errorHandler: errorHandlerFeature.reducer,
         ngrxForms: ngrxFormsFeature.reducer,
         adapt: adaptReducer,
       }),
-      EffectsModule.forRoot([ErrorHandlerEffects, AuthEffects, NgrxFormsEffects]),
+      EffectsModule.forRoot([ErrorHandlerEffects, NgrxFormsEffects]),
       !environment.production ? StoreDevtoolsModule.instrument({ actionSanitizer, stateSanitizer }) : [],
       StoreRouterConnectingModule.forRoot(),
     ),
@@ -97,3 +104,7 @@ bootstrapApplication(AppComponent, {
     ...rootInterceptors,
   ],
 }).catch(err => console.log(err));
+
+export function adaptReducer(state: any = {}, action: PatchState | CommonAction): AdaptModel {
+  return isPatchState(action) ? updatePaths(state, action.payload) : state;
+}
