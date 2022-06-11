@@ -55,11 +55,13 @@ export class SettingsComponent implements OnInit {
   structure$ = this.ngrxFormsFacade.structure$;
   data$ = this.ngrxFormsFacade.data$;
 
+  logout$ = this.authFacade.logout$;
+
   constructor(private store: Store, private authFacade: AuthFacade, private ngrxFormsFacade: NgrxFormsFacade) {}
 
   ngOnInit() {
     this.ngrxFormsFacade.setStructure(structure);
-    this.authFacade.user$.pipe(untilDestroyed(this)).subscribe((user) => this.ngrxFormsFacade.setData(user));
+    this.authFacade.user$.pipe(untilDestroyed(this)).subscribe(user => this.ngrxFormsFacade.setData(user));
   }
 
   updateForm(changes: any) {
@@ -68,9 +70,5 @@ export class SettingsComponent implements OnInit {
 
   submit() {
     this.store.dispatch(editSettingsActions.editSettings());
-  }
-
-  logout() {
-    this.authFacade.logout();
   }
 }

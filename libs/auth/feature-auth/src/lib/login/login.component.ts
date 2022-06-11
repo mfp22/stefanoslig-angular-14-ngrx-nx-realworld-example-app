@@ -34,6 +34,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   structure$ = this.ngrxFormsFacade.structure$;
   data$ = this.ngrxFormsFacade.data$;
 
+  submit$ = this.facade.loginRequest$;
+
   constructor(private ngrxFormsFacade: NgrxFormsFacade, private facade: AuthFacade) {}
 
   ngOnInit() {
@@ -42,10 +44,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   updateForm(changes: any) {
     this.ngrxFormsFacade.updateData(changes);
-  }
-
-  submit() {
-    this.facade.login();
   }
 
   ngOnDestroy() {

@@ -40,6 +40,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   structure$ = this.ngrxFormsFacade.structure$;
   data$ = this.ngrxFormsFacade.data$;
 
+  submit$ = this.facade.registerRequest$;
+
   constructor(private ngrxFormsFacade: NgrxFormsFacade, private facade: AuthFacade) {}
 
   ngOnInit() {
@@ -50,10 +52,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   updateForm(changes: any) {
     this.ngrxFormsFacade.updateData(changes);
-  }
-
-  submit() {
-    this.facade.register();
   }
 
   ngOnDestroy() {
