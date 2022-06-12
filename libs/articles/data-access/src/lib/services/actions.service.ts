@@ -1,7 +1,7 @@
-import { ProfileResponse, ArticleResponse } from '@realworld/core/api-types';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { ArticleResponse, ProfileResponse } from '@realworld/core/api-types';
 import { ApiService } from '@realworld/core/http-client';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ActionsService {

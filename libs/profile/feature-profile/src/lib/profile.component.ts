@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Subject, combineLatest } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { CommonModule } from '@angular/common';
-import { ProfileFacade } from '@realworld/profile/data-access';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { AuthFacade } from '@realworld/auth/data-access';
-import { RouterModule } from '@angular/router';
+import { ProfileFacade } from '@realworld/profile/data-access';
+import { combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @UntilDestroy()
 @Component({
@@ -16,33 +16,14 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileComponent implements OnInit {
-  profile$ = this.facade.profile$;
+export class ProfileComponent {
+  store = this.facade.createProfileStore(this.route.params.pipe(map(params => params['username'])));
+
+  followToggleRequest$ = this.store.sources.followToggleRequest$;
+
+  profile$ = this.store.store.state$;
   currentUser$ = this.authFacade.user$;
-  isUser$: Subject<boolean> = new Subject();
-  following!: boolean;
-  username!: string;
+  isUser$ = combineLatest([this.profile$, this.currentUser$]).pipe(map(([p, u]) => p.username === u.username));
 
-  constructor(private facade: ProfileFacade, private authFacade: AuthFacade) {}
-
-  ngOnInit() {
-    combineLatest([this.profile$, this.currentUser$])
-      .pipe(
-        tap(([p, u]) => {
-          this.username = p.username;
-          this.following = p.following;
-        }),
-        map(([p, u]) => p.username === u.username),
-        untilDestroyed(this),
-      )
-      .subscribe((isUser) => this.isUser$.next(isUser));
-  }
-
-  toggleFollowing() {
-    if (this.following) {
-      this.facade.unfollow(this.username);
-    } else {
-      this.facade.follow(this.username);
-    }
-  }
+  constructor(private route: ActivatedRoute, private facade: ProfileFacade, private authFacade: AuthFacade) {}
 }
