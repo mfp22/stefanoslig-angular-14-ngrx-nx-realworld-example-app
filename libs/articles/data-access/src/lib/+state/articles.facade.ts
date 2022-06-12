@@ -8,6 +8,7 @@ import { articleListActions } from './article-list/article-list.actions';
 import { articleEditActions } from './article-edit/article-edit.actions';
 import { articleQuery } from './article/article.selectors';
 import { ArticleListConfig } from './article-list/article-list.reducer';
+import { Article, Comment } from '@realworld/core/api-types/src';
 
 @Injectable({ providedIn: 'root' })
 export class ArticlesFacade {
@@ -47,8 +48,8 @@ export class ArticlesFacade {
   deleteComment(data: { commentId: number; slug: string }) {
     this.store.dispatch(articleActions.deleteComment(data));
   }
-  submit(slug: string) {
-    this.store.dispatch(articleActions.addComment({ slug }));
+  submit(slug: string, comment: Comment) {
+    this.store.dispatch(articleActions.addComment({ slug, comment }));
   }
   initializeArticle() {
     this.store.dispatch(articleActions.initializeArticle());
@@ -59,7 +60,7 @@ export class ArticlesFacade {
   setListConfig(config: ArticleListConfig) {
     this.store.dispatch(articleListActions.setListConfig({ config }));
   }
-  publishArticle() {
-    this.store.dispatch(articleEditActions.publishArticle());
+  publishArticle(article: Article) {
+    this.store.dispatch(articleEditActions.publishArticle({ article }));
   }
 }

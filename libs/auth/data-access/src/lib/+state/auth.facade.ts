@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import * as fromNgrxForms from '@realworld/core/forms';
 import { NgrxFormsFacade } from '@realworld/core/forms/src';
 import { getHttpSources, Source, toSource } from '@state-adapt/core';
 import { Adapt } from '@state-adapt/ngrx';
-import { exhaustMap, Subject, tap, withLatestFrom } from 'rxjs';
-import { filter, mergeWith, switchMap } from 'rxjs/operators';
+import { exhaustMap, Subject, tap } from 'rxjs';
+import { filter, map, mergeWith, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { LocalStorageJwtService } from '../services/local-storage-jwt.service';
 import { authAdapter, authInitialState } from './auth.adapter';
@@ -20,18 +19,12 @@ export class AuthFacade {
   );
   userRequest = getHttpSources('[Auth]', this.userRequest$, res => [!!res, res, 'Empty response']);
 
-  loginRequest$ = new Source<void>('[Auth] loginRequest$');
-  login$ = this.loginRequest$.pipe(
-    withLatestFrom(this.ngrxFormsFacade.data$),
-    exhaustMap(([, data]) => this.authService.login(data)),
-  );
+  loginRequest$ = new Source<any>('[Auth] loginRequest$');
+  login$ = this.loginRequest$.pipe(exhaustMap(({ payload }) => this.authService.login(payload)));
   loginRequest = getHttpSources('[Auth]', this.login$, res => [!!res, res, 'Empty response']);
 
-  registerRequest$ = new Source<void>('[Auth] registerRequest$');
-  register$ = this.registerRequest$.pipe(
-    withLatestFrom(this.ngrxFormsFacade.data$),
-    exhaustMap(([, data]) => this.authService.register(data)),
-  );
+  registerRequest$ = new Source<any>('[Auth] registerRequest$');
+  register$ = this.registerRequest$.pipe(exhaustMap(({ payload }) => this.authService.register(payload)));
   registerRequest = getHttpSources('[Auth]', this.register$, res => [!!res, res, 'Empty response']);
 
   loginOrRegisterSuccess$ = this.loginRequest.success$.pipe(
@@ -43,9 +36,10 @@ export class AuthFacade {
   );
   loginOrRegisterError$ = this.loginRequest.error$.pipe(
     mergeWith(this.registerRequest.error$),
-    tap(({ payload: err }) => {
-      console.log(fromNgrxForms.setErrors({ errors: { err } }));
-    }),
+    map(action => ({
+      ...action,
+      payload: { auth: action.payload },
+    })),
   );
 
   logout$ = new Subject<void>();

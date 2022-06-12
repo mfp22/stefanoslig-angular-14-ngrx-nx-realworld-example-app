@@ -23,7 +23,6 @@ import {
   errorHandlerFeature,
   ErrorHandlerInterceptorService,
 } from '@realworld/core/error-handler';
-import { NgrxFormsEffects, ngrxFormsFeature } from '@realworld/core/forms';
 import { API_URL } from '@realworld/core/http-client';
 
 if (environment.production) {
@@ -93,10 +92,9 @@ bootstrapApplication(AppComponent, {
       ),
       StoreModule.forRoot({
         errorHandler: errorHandlerFeature.reducer,
-        ngrxForms: ngrxFormsFeature.reducer,
         adapt: adaptReducer,
       }),
-      EffectsModule.forRoot([ErrorHandlerEffects, NgrxFormsEffects]),
+      EffectsModule.forRoot([ErrorHandlerEffects]),
       !environment.production ? StoreDevtoolsModule.instrument({ actionSanitizer, stateSanitizer }) : [],
       StoreRouterConnectingModule.forRoot(),
     ),

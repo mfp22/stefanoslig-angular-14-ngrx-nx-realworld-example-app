@@ -7,13 +7,14 @@
           <a [routerLink]="['/register']">Need an account?</a>
         </p>
 
-        <app-list-errors></app-list-errors>
+        <app-list-errors [errors]="errors$ | async"></app-list-errors>
 
-        <app-dynamic-form (updateForm)="updateForm($event)" [data$]="data$" [structure$]="structure$">
+        <app-dynamic-form (updateForm)="sources.formUpdate$.next($event)" [data$]="data$" [structure$]="structure$">
         </app-dynamic-form>
         <button
+          *ngIf="data$ | async; let data"
           data-e2e-id="sign-in"
-          (click)="submit$.next()"
+          (click)="submit$.next(data)"
           class="btn btn-lg btn-primary pull-xs-right"
           type="submit"
         >

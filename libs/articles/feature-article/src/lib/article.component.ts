@@ -1,7 +1,7 @@
 import { Field, NgrxFormsFacade } from '@realworld/core/forms';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { combineLatest } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ArticlesFacade } from '@realworld/articles/data-access';
 import { AuthFacade } from '@realworld/auth/data-access';
@@ -10,6 +10,8 @@ import { CommonModule } from '@angular/common';
 import { MarkdownPipe } from './pipes/markdown.pipe';
 import { ArticleCommentComponent } from './article-comment/article-comment.component';
 import { AddCommentComponent } from './add-comment/add-comment.component';
+import { formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
+import { Comment } from '@realworld/core/api-types/src';
 
 const structure: Field[] = [
   {
@@ -21,6 +23,7 @@ const structure: Field[] = [
     },
   },
 ];
+const initialState = { ...formsInitialState, structure, data: '' };
 
 @UntilDestroy()
 @Component({
@@ -31,35 +34,30 @@ const structure: Field[] = [
   imports: [CommonModule, ArticleMetaComponent, ArticleCommentComponent, MarkdownPipe, AddCommentComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArticleComponent implements OnInit, OnDestroy {
+export class ArticleComponent implements OnDestroy {
   article$ = this.facade.article$;
   comments$ = this.facade.comments$;
-  canModify = false;
+  canModify$ = this.authFacade.auth$.pipe(
+    filter(auth => auth.loggedIn),
+    auth$ => combineLatest([auth$, this.facade.authorUsername$]),
+    map(([auth, username]) => auth.user.username === username),
+  );
   isAuthenticated$ = this.authFacade.isLoggedIn$;
-  structure$ = this.ngrxFormsFacade.structure$;
-  data$ = this.ngrxFormsFacade.data$;
   currentUser$ = this.authFacade.user$;
-  touchedForm$ = this.ngrxFormsFacade.touched$;
+
+  // TODO: After articles are converted, submit comment through articles.facade and react to result here
+  store = this.ngrxFormsFacade.createFormStore('comment', initialState);
+  sources = this.store.sources;
+  structure$ = this.store.store.structure$;
+  data$ = this.store.store.data$;
+  errors$ = this.store.store.errors$;
+  touched$ = this.store.store.touched$;
 
   constructor(
     private ngrxFormsFacade: NgrxFormsFacade,
     private facade: ArticlesFacade,
     private authFacade: AuthFacade,
   ) {}
-
-  ngOnInit() {
-    this.ngrxFormsFacade.setStructure(structure);
-    this.ngrxFormsFacade.setData('');
-    this.authFacade.auth$
-      .pipe(
-        filter((auth) => auth.loggedIn),
-        (auth$) => combineLatest([auth$, this.facade.authorUsername$]),
-        untilDestroyed(this),
-      )
-      .subscribe(([auth, username]) => {
-        this.canModify = auth.user.username === username;
-      });
-  }
 
   follow(username: string) {
     this.facade.follow(username);
@@ -79,11 +77,8 @@ export class ArticleComponent implements OnInit, OnDestroy {
   deleteComment(data: { commentId: number; slug: string }) {
     this.facade.deleteComment(data);
   }
-  submit(slug: string) {
-    this.facade.submit(slug);
-  }
-  updateForm(changes: any) {
-    this.ngrxFormsFacade.updateData(changes);
+  submit(slug: string, comment: Comment) {
+    this.facade.submit(slug, comment);
   }
 
   ngOnDestroy() {

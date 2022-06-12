@@ -20,7 +20,7 @@ export const articleActions = createActionGroup({
     Unfollow: props<{ username: string }>(),
     'Unfollow Failure': props<{ error: Error }>(),
     'Unfollow Success': props<{ profile: Profile }>(),
-    'Add Comment': props<{ slug: string }>(),
+    'Add Comment': props<{ slug: string; comment: Comment }>(),
     'Add Comment Failure': props<{ error: Error }>(),
     'Add Comment Success': props<{ comment: Comment }>(),
     'Delete Comment': props<{ commentId: number; slug: string }>(),

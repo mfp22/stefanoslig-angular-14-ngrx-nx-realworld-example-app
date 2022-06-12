@@ -1,8 +1,10 @@
-import { DynamicFormComponent, Field, ListErrorsComponent, NgrxFormsFacade } from '@realworld/core/forms';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthFacade } from '@realworld/auth/data-access';
+import { DynamicFormComponent, Field, ListErrorsComponent, NgrxFormsFacade } from '@realworld/core/forms';
+import { formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
 
 const structure: Field[] = [
   {
@@ -28,33 +30,24 @@ const structure: Field[] = [
   },
 ];
 
+const initialState = { ...formsInitialState, structure };
+
 @Component({
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [ListErrorsComponent, DynamicFormComponent, RouterModule],
+  imports: [CommonModule, ListErrorsComponent, DynamicFormComponent, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RegisterComponent implements OnInit, OnDestroy {
-  structure$ = this.ngrxFormsFacade.structure$;
-  data$ = this.ngrxFormsFacade.data$;
+export class RegisterComponent {
+  store = this.ngrxFormsFacade.createFormStore('register', initialState, this.facade.loginOrRegisterError$);
+  sources = this.store.sources;
+  structure$ = this.store.store.structure$;
+  data$ = this.store.store.data$;
+  errors$ = this.store.store.errors$;
 
   submit$ = this.facade.registerRequest$;
 
   constructor(private ngrxFormsFacade: NgrxFormsFacade, private facade: AuthFacade) {}
-
-  ngOnInit() {
-    this.ngrxFormsFacade.setStructure(structure);
-    this.data$ = this.ngrxFormsFacade.data$;
-    this.structure$ = this.ngrxFormsFacade.structure$;
-  }
-
-  updateForm(changes: any) {
-    this.ngrxFormsFacade.updateData(changes);
-  }
-
-  ngOnDestroy() {
-    this.ngrxFormsFacade.initializeForm();
-  }
 }

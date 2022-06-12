@@ -1,9 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { NgrxFormsFacade } from '../+state/forms.facade';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 
-@UntilDestroy()
 @Component({
   selector: 'app-list-errors',
   standalone: true,
@@ -12,19 +9,12 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListErrorsComponent implements OnInit, OnDestroy {
-  errors: string[] = [];
-
-  constructor(private ngrxFormsFacade: NgrxFormsFacade, private changeDetectorRef: ChangeDetectorRef) {}
-
-  ngOnInit() {
-    this.ngrxFormsFacade.errors$.pipe(untilDestroyed(this)).subscribe((e) => {
-      this.errors = Object.keys(e || {}).map((key) => `${key} ${e[key]}`);
-      this.changeDetectorRef.markForCheck();
-    });
+export class ListErrorsComponent {
+  @Input() set errors(e: { [index: string]: string }) {
+    this._errors = Object.keys(e || {}).map(key => `${key} ${e[key]}`);
+    this.changeDetectorRef.markForCheck();
   }
+  _errors: string[] = [];
 
-  ngOnDestroy() {
-    this.ngrxFormsFacade.initializeErrors();
-  }
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 }

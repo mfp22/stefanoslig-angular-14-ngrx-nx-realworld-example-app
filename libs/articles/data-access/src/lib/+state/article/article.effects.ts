@@ -1,24 +1,23 @@
-import { ArticlesService } from '../../services/articles.service';
-import { ActionsService } from '../../services/actions.service';
 import { Injectable } from '@angular/core';
-import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
+import { Router } from '@angular/router';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { NgrxFormsFacade } from '@realworld/core/forms';
 import { of } from 'rxjs';
 import { catchError, concatMap, exhaustMap, map, mergeMap, tap } from 'rxjs/operators';
-import { articleActions } from './article.actions';
+import { ActionsService } from '../../services/actions.service';
+import { ArticlesService } from '../../services/articles.service';
 import { articlesActions } from '../articles.actions';
-
-import { NgrxFormsFacade, setErrors, resetForm } from '@realworld/core/forms';
-import { Router } from '@angular/router';
+import { articleActions } from './article.actions';
 
 @Injectable()
 export class ArticleEffects {
   loadArticle = createEffect(() =>
     this.actions$.pipe(
       ofType(articleActions.loadArticle),
-      concatMap((action) =>
+      concatMap(action =>
         this.articlesService.getArticle(action.slug).pipe(
-          map((response) => articleActions.loadArticleSuccess({ article: response.article })),
-          catchError((error) => of(articleActions.loadArticleFailure(error))),
+          map(response => articleActions.loadArticleSuccess({ article: response.article })),
+          catchError(error => of(articleActions.loadArticleFailure(error))),
         ),
       ),
     ),
@@ -27,10 +26,10 @@ export class ArticleEffects {
   loadComments = createEffect(() =>
     this.actions$.pipe(
       ofType(articleActions.loadComments),
-      concatMap((action) =>
+      concatMap(action =>
         this.articlesService.getComments(action.slug).pipe(
-          map((data) => articleActions.loadCommentsSuccess({ comments: data.comments })),
-          catchError((error) => of(articleActions.loadCommentsFailure(error))),
+          map(data => articleActions.loadCommentsSuccess({ comments: data.comments })),
+          catchError(error => of(articleActions.loadCommentsFailure(error))),
         ),
       ),
     ),
@@ -39,11 +38,11 @@ export class ArticleEffects {
   deleteArticle = createEffect(() =>
     this.actions$.pipe(
       ofType(articleActions.deleteArticle),
-      concatMap((action) =>
+      concatMap(action =>
         this.articlesService.deleteArticle(action.slug).pipe(
-          tap((_) => this.router.navigate(['/'])),
-          map((_) => articleActions.deleteArticleSuccess()),
-          catchError((error) => of(articleActions.deleteArticleFailure(error))),
+          tap(_ => this.router.navigate(['/'])),
+          map(_ => articleActions.deleteArticleSuccess()),
+          catchError(error => of(articleActions.deleteArticleFailure(error))),
         ),
       ),
     ),
@@ -52,11 +51,10 @@ export class ArticleEffects {
   addComment = createEffect(() =>
     this.actions$.pipe(
       ofType(articleActions.addComment),
-      concatLatestFrom(() => this.ngrxFormsFacade.data$),
-      exhaustMap(([{ slug }, data]) =>
-        this.articlesService.addComment(slug, data.comment).pipe(
-          mergeMap((response) => [articleActions.addCommentSuccess({ comment: response.comment }), resetForm()]),
-          catchError((result) => of(setErrors({ errors: result.error.errors }))),
+      exhaustMap(({ slug, comment }) =>
+        this.articlesService.addComment(slug, comment.body).pipe(
+          mergeMap(response => [articleActions.addCommentSuccess({ comment: response.comment })]), // , resetForm()
+          // catchError((result) => of(setErrors({ errors: result.error.errors }))),
         ),
       ),
     ),
@@ -65,10 +63,10 @@ export class ArticleEffects {
   deleteComment = createEffect(() =>
     this.actions$.pipe(
       ofType(articleActions.deleteComment),
-      concatMap((action) =>
+      concatMap(action =>
         this.articlesService.deleteComment(action.commentId, action.slug).pipe(
-          map((_) => articleActions.deleteCommentSuccess({ commentId: action.commentId })),
-          catchError((error) => of(articleActions.deleteCommentFailure(error))),
+          map(_ => articleActions.deleteCommentSuccess({ commentId: action.commentId })),
+          catchError(error => of(articleActions.deleteCommentFailure(error))),
         ),
       ),
     ),
@@ -79,8 +77,8 @@ export class ArticleEffects {
       ofType(articleActions.follow),
       concatMap(({ username }) =>
         this.actionsService.followUser(username).pipe(
-          map((response) => articleActions.followSuccess({ profile: response.profile })),
-          catchError((error) => of(articleActions.followFailure(error))),
+          map(response => articleActions.followSuccess({ profile: response.profile })),
+          catchError(error => of(articleActions.followFailure(error))),
         ),
       ),
     ),
@@ -91,8 +89,8 @@ export class ArticleEffects {
       ofType(articleActions.unfollow),
       concatMap(({ username }) =>
         this.actionsService.unfollowUser(username).pipe(
-          map((response) => articleActions.unfollowSuccess({ profile: response.profile })),
-          catchError((error) => of(articleActions.unfollowFailure(error))),
+          map(response => articleActions.unfollowSuccess({ profile: response.profile })),
+          catchError(error => of(articleActions.unfollowFailure(error))),
         ),
       ),
     ),
@@ -103,8 +101,8 @@ export class ArticleEffects {
       ofType(articlesActions.favorite),
       concatMap(({ slug }) =>
         this.actionsService.favorite(slug).pipe(
-          map((response) => articlesActions.favoriteSuccess({ article: response.article })),
-          catchError((error) => of(articlesActions.favoriteFailure(error))),
+          map(response => articlesActions.favoriteSuccess({ article: response.article })),
+          catchError(error => of(articlesActions.favoriteFailure(error))),
         ),
       ),
     ),
@@ -115,8 +113,8 @@ export class ArticleEffects {
       ofType(articlesActions.unfavorite),
       concatMap(({ slug }) =>
         this.actionsService.unfavorite(slug).pipe(
-          map((response) => articlesActions.unfavoriteSuccess({ article: response.article })),
-          catchError((error) => of(articlesActions.unfavoriteFailure(error))),
+          map(response => articlesActions.unfavoriteSuccess({ article: response.article })),
+          catchError(error => of(articlesActions.unfavoriteFailure(error))),
         ),
       ),
     ),

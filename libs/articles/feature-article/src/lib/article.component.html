@@ -9,7 +9,7 @@
         (favorite)="favorite($event)"
         (unfavorite)="unfavorite($event)"
         (delete)="delete($event)"
-        [canModify]="canModify"
+        [canModify]="canModify$ | async"
       >
       </app-article-meta>
     </div>
@@ -30,21 +30,21 @@
         (favorite)="favorite($event)"
         (unfavorite)="unfavorite($event)"
         (delete)="delete($event)"
-        [canModify]="canModify"
+        [canModify]="canModify$ | async"
       ></app-article-meta>
     </div>
 
     <div class="row">
-      <div class="col-xs-12 col-md-8 offset-md-2">
+      <div class="col-xs-12 col-md-8 offset-md-2" *ngIf="data$ | async; let data">
         <app-add-comment
           *ngIf="isAuthenticated$ | async"
           [article]="article$ | async"
           [data$]="data$"
           [structure$]="structure$"
           [currentUser]="currentUser$ | async"
-          [touchedForm$]="touchedForm$"
-          (submitComment)="submit($event)"
-          (updateForm)="updateForm($event)"
+          [touchedForm$]="touched$"
+          (submitComment)="submit($event, data)"
+          (updateForm)="sources.formUpdate$.next($event)"
         >
         </app-add-comment>
 

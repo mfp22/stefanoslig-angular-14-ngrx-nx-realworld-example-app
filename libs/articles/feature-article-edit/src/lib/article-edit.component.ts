@@ -1,9 +1,12 @@
-import { DynamicFormComponent, Field, ListErrorsComponent, NgrxFormsFacade } from '@realworld/core/forms';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { Validators } from '@angular/forms';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ArticlesFacade } from '@realworld/articles/data-access';
+import { Article } from '@realworld/core/api-types/src';
+import { DynamicFormComponent, Field, ListErrorsComponent, NgrxFormsFacade } from '@realworld/core/forms';
+import { formsAdapter, formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
+import { Adapt } from '@state-adapt/ngrx';
+import { map, publishReplay, refCount, switchMap } from 'rxjs';
 
 const structure: Field[] = [
   {
@@ -32,36 +35,38 @@ const structure: Field[] = [
   },
 ];
 
-@UntilDestroy()
 @Component({
   selector: 'app-article-edit',
   standalone: true,
   templateUrl: './article-edit.component.html',
   styleUrls: ['./article-edit.component.css'],
-  imports: [DynamicFormComponent, ListErrorsComponent],
+  imports: [CommonModule, DynamicFormComponent, ListErrorsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArticleEditComponent implements OnInit, OnDestroy {
-  structure$ = this.ngrxFormsFacade.structure$;
-  data$ = this.ngrxFormsFacade.data$;
+export class ArticleEditComponent implements OnDestroy {
+  store$ = this.facade.article$.pipe(
+    map(article => {
+      const initialState = { ...formsInitialState, structure, data: article };
+      // const error$ = this.submitRequest.error$.pipe(map(action => ({ ...action, payload: { error: action.payload } })));
+      return this.ngrxFormsFacade.createFormStore('articleEdit', initialState);
+    }),
+    publishReplay(1),
+    refCount(),
+  );
+  sources$ = this.store$.pipe(map(store => store.sources));
+  errors$ = this.store$.pipe(switchMap(store => store.store.errors$));
 
-  constructor(private ngrxFormsFacade: NgrxFormsFacade, private facade: ArticlesFacade) {}
+  spyStore = this.adapt.spy('articleEdit.form', formsAdapter);
+  structure$ = this.spyStore.structure$;
+  data$ = this.spyStore.data$;
 
-  ngOnInit() {
-    this.ngrxFormsFacade.setStructure(structure);
-    this.facade.article$.pipe(untilDestroyed(this)).subscribe((article) => this.ngrxFormsFacade.setData(article));
-  }
+  constructor(private adapt: Adapt, private ngrxFormsFacade: NgrxFormsFacade, private facade: ArticlesFacade) {}
 
-  updateForm(changes: any) {
-    this.ngrxFormsFacade.updateData(changes);
-  }
-
-  submit() {
-    this.facade.publishArticle();
+  submit(article: Article) {
+    this.facade.publishArticle(article);
   }
 
   ngOnDestroy() {
-    this.ngrxFormsFacade.initializeForm();
     this.facade.initializeArticle();
   }
 }
