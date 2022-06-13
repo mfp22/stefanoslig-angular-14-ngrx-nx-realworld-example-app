@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgrxFormsFacade } from '@realworld/core/forms/src';
 import { getHttpSources, Source, toSource } from '@state-adapt/core';
 import { Adapt } from '@state-adapt/ngrx';
 import { exhaustMap, Subject, tap } from 'rxjs';
@@ -36,10 +35,7 @@ export class AuthFacade {
   );
   loginOrRegisterError$ = this.loginRequest.error$.pipe(
     mergeWith(this.registerRequest.error$),
-    map(action => ({
-      ...action,
-      payload: { auth: action.payload },
-    })),
+    map(action => ({ ...action, payload: { auth: action.payload } })),
   );
 
   logout$ = new Subject<void>();
@@ -65,7 +61,6 @@ export class AuthFacade {
   constructor(
     private adapt: Adapt,
     private authService: AuthService,
-    private ngrxFormsFacade: NgrxFormsFacade,
     private localStorageJwtService: LocalStorageJwtService,
     private router: Router,
   ) {}

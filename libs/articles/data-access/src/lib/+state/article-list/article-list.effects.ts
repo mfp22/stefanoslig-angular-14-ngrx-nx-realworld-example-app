@@ -6,7 +6,6 @@ import { catchError, concatMap, map } from 'rxjs/operators';
 
 import { ArticlesService } from '../../services/articles.service';
 import { articleListActions } from './article-list.actions';
-import { articlesActions } from '../articles.actions';
 
 import { ArticlesFacade } from '../articles.facade';
 
@@ -32,41 +31,41 @@ export class ArticleListEffects {
       concatLatestFrom(() => this.facade.listConfig$),
       concatMap(([_, config]) =>
         this.articlesService.query(config).pipe(
-          map((results) =>
+          map(results =>
             articleListActions.loadArticlesSuccess({
               articles: results.articles,
               articlesCount: results.articlesCount,
             }),
           ),
-          catchError((error) => of(articleListActions.loadArticlesFailure({ error }))),
+          catchError(error => of(articleListActions.loadArticlesFailure({ error }))),
         ),
       ),
     ),
   );
 
-  favorite = createEffect(() =>
-    this.actions$.pipe(
-      ofType(articlesActions.favorite),
-      concatMap(({ slug }) =>
-        this.actionsService.favorite(slug).pipe(
-          map((response) => articlesActions.favoriteSuccess({ article: response.article })),
-          catchError((error) => of(articlesActions.favoriteFailure(error))),
-        ),
-      ),
-    ),
-  );
+  // favorite = createEffect(() =>
+  //   this.actions$.pipe(
+  //     ofType(articlesActions.favorite),
+  //     concatMap(({ slug }) =>
+  //       this.actionsService.favorite(slug).pipe(
+  //         map((response) => articlesActions.favoriteSuccess({ article: response.article })),
+  //         catchError((error) => of(articlesActions.favoriteFailure(error))),
+  //       ),
+  //     ),
+  //   ),
+  // );
 
-  unFavorite = createEffect(() =>
-    this.actions$.pipe(
-      ofType(articlesActions.unfavorite),
-      concatMap(({ slug }) =>
-        this.actionsService.unfavorite(slug).pipe(
-          map((response) => articlesActions.unfavoriteSuccess({ article: response.article })),
-          catchError((error) => of(articlesActions.unfavoriteFailure(error))),
-        ),
-      ),
-    ),
-  );
+  // unFavorite = createEffect(() =>
+  //   this.actions$.pipe(
+  //     ofType(articlesActions.unfavorite),
+  //     concatMap(({ slug }) =>
+  //       this.actionsService.unfavorite(slug).pipe(
+  //         map((response) => articlesActions.unfavoriteSuccess({ article: response.article })),
+  //         catchError((error) => of(articlesActions.unfavoriteFailure(error))),
+  //       ),
+  //     ),
+  //   ),
+  // );
 
   constructor(
     private actions$: Actions,

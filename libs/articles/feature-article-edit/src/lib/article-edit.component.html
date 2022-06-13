@@ -12,7 +12,7 @@
           *ngIf="data$ | async; let data"
           class="btn btn-lg pull-xs-right btn-primary"
           type="button"
-          (click)="submit(data)"
+          (click)="facade.publishArticle$.next(data)"
         >
           Publish Article
         </button>

@@ -19,7 +19,7 @@ export class NgrxFormsFacade {
     const store = this.adapt.init([`${featureName}.form`, formsAdapter, initialState], {
       updateData: sources.formUpdate$,
       setUntouched: sources.setUntouched$,
-      setErrors: sources.errors$, // || [],
+      setErrors: sources.errors$ || [],
     });
 
     return { sources, store };

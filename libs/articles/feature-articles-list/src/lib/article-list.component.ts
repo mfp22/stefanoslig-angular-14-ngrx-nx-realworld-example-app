@@ -22,11 +22,11 @@ export class ArticleListComponent {
   constructor(private readonly facade: ArticlesFacade, private readonly router: Router) {}
 
   favorite(slug: string) {
-    this.facade.favorite(slug);
+    // this.facade.favorite(slug);
   }
 
   unFavorite(slug: string) {
-    this.facade.unfavorite(slug);
+    // this.facade.unfavorite(slug);
   }
 
   navigateToArticle(slug: string) {

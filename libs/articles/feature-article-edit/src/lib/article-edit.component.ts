@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { ArticlesFacade } from '@realworld/articles/data-access';
-import { Article } from '@realworld/core/api-types/src';
 import { DynamicFormComponent, Field, ListErrorsComponent, NgrxFormsFacade } from '@realworld/core/forms';
 import { formsAdapter, formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
 import { Adapt } from '@state-adapt/ngrx';
@@ -43,12 +43,14 @@ const structure: Field[] = [
   imports: [CommonModule, DynamicFormComponent, ListErrorsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArticleEditComponent implements OnDestroy {
+export class ArticleEditComponent implements OnInit, OnDestroy {
   store$ = this.facade.article$.pipe(
     map(article => {
       const initialState = { ...formsInitialState, structure, data: article };
-      // const error$ = this.submitRequest.error$.pipe(map(action => ({ ...action, payload: { error: action.payload } })));
-      return this.ngrxFormsFacade.createFormStore('articleEdit', initialState);
+      const error$ = this.facade.publishArticleRequest.error$.pipe(
+        map(action => ({ ...action, payload: { error: action.payload } })),
+      );
+      return this.ngrxFormsFacade.createFormStore('articleEdit', initialState, error$);
     }),
     publishReplay(1),
     refCount(),
@@ -60,13 +62,18 @@ export class ArticleEditComponent implements OnDestroy {
   structure$ = this.spyStore.structure$;
   data$ = this.spyStore.data$;
 
-  constructor(private adapt: Adapt, private ngrxFormsFacade: NgrxFormsFacade, private facade: ArticlesFacade) {}
+  constructor(
+    private adapt: Adapt,
+    private ngrxFormsFacade: NgrxFormsFacade,
+    public facade: ArticlesFacade,
+    private route: ActivatedRoute,
+  ) {}
 
-  submit(article: Article) {
-    this.facade.publishArticle(article);
+  ngOnInit() {
+    this.facade.articleSlugUpdate$.next(this.route.snapshot.params['slug']);
   }
 
   ngOnDestroy() {
-    this.facade.initializeArticle();
+    this.facade.articleSlugUpdate$.next('');
   }
 }

@@ -1,7 +1,6 @@
 import { Article } from '@realworld/core/api-types';
 import { createFeature, createReducer, on } from '@ngrx/store';
 import { articleListActions } from './article-list.actions';
-import { articlesActions } from '../articles.actions';
 
 export const articleListFeatureKey = 'articles-list';
 
@@ -69,7 +68,7 @@ export const articleListFeature = createFeature({
       ...state,
       listConfig: config,
     })),
-    on(articleListActions.loadArticles, (state) => {
+    on(articleListActions.loadArticles, state => {
       const articles = { ...state.articles, loading: true };
       return { ...state, articles };
     }),
@@ -93,15 +92,15 @@ export const articleListFeature = createFeature({
       };
       return { ...state, articles };
     }),
-    on(articlesActions.unfavoriteSuccess, articlesActions.favoriteSuccess, (state, { article }) => ({
-      ...state,
-      articles: replaceArticle(state.articles, article),
-    })),
+    // on(articlesActions.unfavoriteSuccess, articlesActions.favoriteSuccess, (state, { article }) => ({
+    //   ...state,
+    //   articles: replaceArticle(state.articles, article),
+    // })),
   ),
 });
 
 function replaceArticle(articles: Articles, payload: Article): Articles {
-  const articleIndex = articles.entities.findIndex((a) => a.slug === payload.slug);
+  const articleIndex = articles.entities.findIndex(a => a.slug === payload.slug);
   const entities = [
     ...articles.entities.slice(0, articleIndex),
     Object.assign({}, articles.entities[articleIndex], payload),

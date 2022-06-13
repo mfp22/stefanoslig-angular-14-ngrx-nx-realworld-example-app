@@ -4,11 +4,11 @@
       <h1 data-e2e-id="article-title">{{ (article$ | async).title }}</h1>
       <app-article-meta
         [article]="article$ | async"
-        (follow)="follow($event)"
-        (unfollow)="unfollow($event)"
-        (favorite)="favorite($event)"
-        (unfavorite)="unfavorite($event)"
-        (delete)="delete($event)"
+        (follow)="facade.follow$.next($event)"
+        (unfollow)="facade.unfollow$.next($event)"
+        (favorite)="facade.favorite$.next($event)"
+        (unfavorite)="facade.unfavorite$.next($event)"
+        (delete)="facade.deleteArticle$.next($event)"
         [canModify]="canModify$ | async"
       >
       </app-article-meta>
@@ -25,17 +25,17 @@
     <div class="article-actions">
       <app-article-meta
         [article]="article$ | async"
-        (follow)="follow($event)"
-        (unfollow)="unfollow($event)"
-        (favorite)="favorite($event)"
-        (unfavorite)="unfavorite($event)"
-        (delete)="delete($event)"
+        (follow)="facade.follow$.next($event)"
+        (unfollow)="facade.unfollow$.next($event)"
+        (favorite)="facade.favorite$.next($event)"
+        (unfavorite)="facade.unfavorite$.next($event)"
+        (delete)="facade.deleteArticle$.next($event)"
         [canModify]="canModify$ | async"
       ></app-article-meta>
     </div>
 
     <div class="row">
-      <div class="col-xs-12 col-md-8 offset-md-2" *ngIf="data$ | async; let data">
+      <div class="col-xs-12 col-md-8 offset-md-2" *ngIf="data$ | async as data">
         <app-add-comment
           *ngIf="isAuthenticated$ | async"
           [article]="article$ | async"
@@ -43,7 +43,7 @@
           [structure$]="structure$"
           [currentUser]="currentUser$ | async"
           [touchedForm$]="touched$"
-          (submitComment)="submit($event, data)"
+          (submitComment)="facade.addComment$.next({ slug: $event, comment: data.comment })"
           (updateForm)="sources.formUpdate$.next($event)"
         >
         </app-add-comment>
@@ -56,7 +56,7 @@
         <app-article-comment
           *ngFor="let comment of comments$ | async"
           [currentUser]="currentUser$ | async"
-          (delete)="deleteComment($event)"
+          (delete)="facade.deleteComment$.next($event)"
           [article]="article$ | async"
           [comment]="comment"
         ></app-article-comment>
