@@ -11,20 +11,15 @@ export class ErrorHandlerInterceptorService implements HttpInterceptor {
   constructor(private facade: ErrorHandlerFacade) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const errorSources = {
+      401: this.facade.error401$,
+      404: this.facade.error404$,
+    };
     return next.handle(request).pipe(
-      catchError((error) => {
+      catchError(error => {
         if (error instanceof HttpErrorResponse) {
-          switch (error.status) {
-            case 401:
-              this.facade.throw401Error(error);
-              break;
-            case 404:
-              this.facade.throw404Error(error);
-              break;
-            default:
-              throwError(error);
-              break;
-          }
+          const source = errorSources[error.status as keyof typeof errorSources];
+          source ? source.next(error) : throwError(error);
         }
         return throwError(error);
       }),

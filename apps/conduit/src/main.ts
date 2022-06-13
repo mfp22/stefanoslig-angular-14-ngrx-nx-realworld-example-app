@@ -18,11 +18,7 @@ import {
 } from '@state-adapt/core';
 import { TokenInterceptorService } from '@realworld/auth/data-access';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import {
-  ErrorHandlerEffects,
-  errorHandlerFeature,
-  ErrorHandlerInterceptorService,
-} from '@realworld/core/error-handler';
+import { ErrorHandlerInterceptorService } from '@realworld/core/error-handler';
 import { API_URL } from '@realworld/core/http-client';
 
 if (environment.production) {
@@ -90,11 +86,8 @@ bootstrapApplication(AppComponent, {
           relativeLinkResolution: 'legacy',
         },
       ),
-      StoreModule.forRoot({
-        errorHandler: errorHandlerFeature.reducer,
-        adapt: adaptReducer,
-      }),
-      EffectsModule.forRoot([ErrorHandlerEffects]),
+      StoreModule.forRoot({ adapt: adaptReducer }),
+      EffectsModule.forRoot([]),
       !environment.production ? StoreDevtoolsModule.instrument({ actionSanitizer, stateSanitizer }) : [],
       StoreRouterConnectingModule.forRoot(),
     ),

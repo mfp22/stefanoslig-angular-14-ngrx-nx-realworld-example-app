@@ -1,19 +1,19 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
-
-import { ErrorHandlerState } from './error-handler.reducer';
-import * as ErrorHandlerActions from './error-handler.actions';
+import { Router } from '@angular/router';
+import { Source } from '@state-adapt/core';
+import { Adapt } from '@state-adapt/ngrx';
+import { tap } from 'rxjs';
+import { errorHandlerInitialState } from './error-handler.state';
 
 @Injectable({ providedIn: 'root' })
 export class ErrorHandlerFacade {
-  constructor(private store: Store<ErrorHandlerState>) {}
+  error401$ = new Source<HttpErrorResponse>('[Error Handler] 401');
+  error404$ = new Source<HttpErrorResponse>('[Error Handler] 404');
+  error401Source$ = this.error401$.pipe(tap(() => this.router.navigate(['/login'])));
+  error404Source$ = this.error404$.pipe(tap(() => this.router.navigate(['/'])));
 
-  throw401Error(error: HttpErrorResponse) {
-    this.store.dispatch(ErrorHandlerActions.throw401Error({ error }));
-  }
+  state$ = this.adapt.setter('errorHandler', errorHandlerInitialState, [this.error401Source$, this.error404Source$]);
 
-  throw404Error(error: HttpErrorResponse) {
-    this.store.dispatch(ErrorHandlerActions.throw404Error({ error }));
-  }
+  constructor(private adapt: Adapt, private router: Router) {}
 }
