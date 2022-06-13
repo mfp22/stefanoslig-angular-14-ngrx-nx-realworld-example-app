@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { ArticlesFacade } from '@realworld/articles/data-access';
+import { articleListInitialState, ArticlesFacade, initialListConfig, ListType } from '@realworld/articles/data-access';
 import { ArticleListItemComponent } from './article-list-item/article-list-item.component';
 
 @Component({
@@ -14,26 +14,39 @@ import { ArticleListItemComponent } from './article-list-item/article-list-item.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticleListComponent {
-  totalPages$ = this.facade.totalPages$;
-  articles$ = this.facade.articles$;
-  listConfig$ = this.facade.listConfig$;
-  isLoading$ = this.facade.isLoading$;
+  listPageChange$ = this.facade.listPageChange$;
+  favorite$ = this.facade.favorite$;
+  unfavorite$ = this.facade.unfavorite$;
 
-  constructor(private readonly facade: ArticlesFacade, private readonly router: Router) {}
+  isHome = (this.route.snapshot.data as any).isHome as boolean;
+  isFavorites = (this.route.snapshot.data as any).isFavorites as boolean;
+  isUsername = !!this.route.snapshot.params['username'];
+  filters = this.isFavorites
+    ? {
+        ...initialListConfig.filters,
+        favorited: this.route.snapshot.parent?.params['username'],
+      }
+    : {
+        ...initialListConfig.filters,
+        author: this.route.snapshot.params['username'],
+      };
+  initialState = {
+    ...initialListConfig,
+    type: this.isHome ? 'DEFAULT' : ('ALL' as ListType),
+    filters: this.isUsername || this.isFavorites ? this.filters : initialListConfig.filters,
+  };
+  store = this.facade.createArticleListStore(this.initialState);
 
-  favorite(slug: string) {
-    // this.facade.favorite(slug);
-  }
+  totalPages$ = this.store.totalPages$;
+  articles$ = this.store.articles$;
+  listConfig$ = this.store.listConfig$;
+  isLoading$ = this.store.isLoading$;
 
-  unFavorite(slug: string) {
-    // this.facade.unfavorite(slug);
+  constructor(private facade: ArticlesFacade, private router: Router, private route: ActivatedRoute) {
+    this.isLoading$.subscribe(a => console.log('this.isLoading', a));
   }
 
   navigateToArticle(slug: string) {
     this.router.navigate(['/article', slug]);
-  }
-
-  setPage(page: number) {
-    this.facade.setPage(page);
   }
 }

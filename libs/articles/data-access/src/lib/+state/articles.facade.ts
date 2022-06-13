@@ -1,15 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { AuthFacade } from '@realworld/auth/data-access/src';
 import { Article } from '@realworld/core/api-types/src';
-import { Action, getHttpSources, Source } from '@state-adapt/core';
+import { Action, getHttpSources, joinSelectors, Source } from '@state-adapt/core';
 import { Adapt } from '@state-adapt/ngrx';
 import { BehaviorSubject, concatMap, exhaustMap, filter, map, Observable, switchMap, tap } from 'rxjs';
 import { ActionsService } from '../services/actions.service';
 import { ArticlesService } from '../services/articles.service';
-import { articleListActions } from './article-list/article-list.actions';
-import { ArticleListConfig } from './article-list/article-list.reducer';
-import { articleListQuery } from './article-list/article-list.selectors';
+import {
+  articleListAdapter,
+  ArticleListConfig,
+  articleListInitialState,
+  ArticleListState,
+  initialListConfig,
+  ListType,
+} from './article-list/article-list.adapter';
 import { articleAdapter, articleInitialState } from './article/article.adapter';
 
 @Injectable({ providedIn: 'root' })
@@ -129,24 +134,40 @@ export class ArticlesFacade {
   articleLoaded$ = this.articleStore.articleLoaded$;
   authorUsername$ = this.articleStore.authorUsername$;
 
-  listConfig$ = this.store.select(articleListQuery.selectListConfig);
-  articles$ = this.store.select(articleListQuery.selectArticleEntities);
-  isLoading$ = this.store.select(articleListQuery.isLoading);
-  articlesCount$ = this.store.select(articleListQuery.selectArticlesCount);
-  totalPages$ = this.store.select(articleListQuery.selectTotalPages);
+  // Article List
+  listChange$ = new Source<ListType | undefined>('[Article List] listChange$');
+  listTagChange$ = new Source<string>('[Article List] listTagChange$');
+  listPageChange$ = new Source<number>('[Article List] listPageChange$');
+  listConfigChange$ = new Source<ArticleListConfig>('[Article List] listConfigChange$');
+
+  listConfigSpy = this.adapt.spy('articleList', articleListAdapter);
+  listConfig$ = joinSelectors(
+    [this.authFacade.store, 'loggedIn'],
+    [this.listConfigSpy, 'listConfig'],
+    (loggedIn, config) =>
+      config?.type !== 'DEFAULT' ? config : { ...config, type: (loggedIn ? 'FEED' : 'ALL') as ListType },
+  ).state$;
+  articleListRequest$ = this.listConfig$.pipe(switchMap(config => this.articlesService.query(config)));
+  articleListRequest = getHttpSources('[Article List]', this.articleListRequest$, res => [!!res, res, 'Error']);
 
   constructor(
-    private store: Store,
     private router: Router,
     private adapt: Adapt,
     private articlesService: ArticlesService,
     private actionsService: ActionsService,
+    private authFacade: AuthFacade,
   ) {}
 
-  setPage(page: number) {
-    this.store.dispatch(articleListActions.setListPage({ page }));
-  }
-  setListConfig(config: ArticleListConfig) {
-    this.store.dispatch(articleListActions.setListConfig({ config }));
+  createArticleListStore(listConfig: ArticleListConfig = initialListConfig) {
+    const initialState: ArticleListState = { ...articleListInitialState, listConfig };
+    return this.adapt.init(['articleList', articleListAdapter, initialState], {
+      setListType: this.listChange$,
+      setListPage: this.listPageChange$,
+      setListConfig: this.listConfigChange$,
+      awaitArticles: this.articleListRequest.request$ as Observable<Action<any>>,
+      receiveArticles: this.articleListRequest.success$,
+      articlesError: this.articleListRequest.error$,
+      updateArticle: [this.favoriteRequest.success$, this.unfavoriteRequest.success$],
+    });
   }
 }

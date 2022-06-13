@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { ApiService } from '@realworld/core/http-client';
-import { Article, ArticleResponse, MultipleCommentsResponse, SingleCommentResponse } from '@realworld/core/api-types';
-import { ArticleListConfig } from '../+state/article-list/article-list.reducer';
 import { HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Article, ArticleResponse, MultipleCommentsResponse, SingleCommentResponse } from '@realworld/core/api-types';
+import { ApiService } from '@realworld/core/http-client';
+import { Observable } from 'rxjs';
+import { ArticleListConfig } from '../+state/article-list/article-list.adapter';
 
 @Injectable({ providedIn: 'root' })
 export class ArticlesService {

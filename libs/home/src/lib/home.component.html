@@ -15,7 +15,7 @@
               <a
                 [ngClass]="{ active: (listConfig$ | async)?.type === 'FEED' }"
                 class="nav-link"
-                (click)="setListTo('FEED')"
+                (click)="listChange$.next('FEED')"
                 >Your Feed</a
               >
             </li>
@@ -26,14 +26,14 @@
                   active: (listConfig$ | async)?.type === 'ALL' && !(listConfig$ | async).filters?.tag
                 }"
                 class="nav-link"
-                (click)="setListTo('ALL')"
+                (click)="listChange$.next('ALL')"
                 >Global Feed</a
               >
             </li>
-            <li class="nav-item" [hidden]="!(listConfig$ | async).filters?.tag">
+            <li class="nav-item" [hidden]="!(listConfig$ | async)?.filters?.tag">
               <a class="nav-link active">
                 <i class="ion-pound"></i>
-                {{ (listConfig$ | async).filters?.tag }}
+                {{ (listConfig$ | async)?.filters?.tag }}
               </a>
             </li>
           </ul>
@@ -44,7 +44,7 @@
 
       <div class="col-md-3">
         <div class="sidebar">
-          <app-tags-list (setListTag)="setListTag($event)" [tags]="tags$ | async"></app-tags-list>
+          <app-tags-list (setListTag)="listTagChange$.next($event)" [tags]="tags$ | async"></app-tags-list>
         </div>
       </div>
     </div>
