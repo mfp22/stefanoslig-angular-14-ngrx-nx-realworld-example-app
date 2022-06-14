@@ -33,7 +33,6 @@ export const articleInitialState: ArticleState = {
 };
 
 export const articleAdapter = createAdapter<ArticleState>()({
-  noop: state => state,
   receiveArticle: (state, article: Article) => ({
     ...state,
     data: article,
