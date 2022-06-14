@@ -6,10 +6,8 @@
 
         <app-list-errors [errors]="errors$ | async"></app-list-errors>
 
-        <ng-container *ngIf="sources$ | async; let sources">
-          <app-dynamic-form (updateForm)="sources.formUpdate$.next($event)" [data$]="data$" [structure$]="structure$">
-          </app-dynamic-form>
-        </ng-container>
+        <app-dynamic-form (updateForm)="sources.formUpdate$.next($event)" [data$]="data$" [structure$]="structure$">
+        </app-dynamic-form>
         <div class="edit-button-container" *ngIf="data$ | async; let data">
           <button (click)="submit$.next(data)" class="btn btn-lg btn-primary pull-xs-right" type="submit">
             Update Settings

@@ -18,7 +18,7 @@ export const formsInitialState: FormsState = {
 };
 
 export const formsAdapter = createAdapter<FormsState>()({
-  setData: (state, data: any) => ({ ...state, data, erros: {} }),
+  setData: (state, data: any) => ({ ...state, data, errors: {} }),
   updateData: (state, data: any) => ({ ...state, data: { ...state.data, ...data }, errors: {} }),
   setErrors: (state, errors: Errors) => ({ ...state, errors }),
   resetErrors: state => ({ ...state, errors: {} }),

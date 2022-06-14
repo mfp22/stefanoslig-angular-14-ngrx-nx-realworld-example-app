@@ -22,6 +22,7 @@ export class DynamicFormComponent implements OnInit {
   @Input() touchedForm$!: Observable<boolean>;
   @Output() updateForm: EventEmitter<any> = new EventEmitter();
   form!: FormGroup;
+  data: any;
 
   constructor(private fb: FormBuilder) {}
 
@@ -29,9 +30,10 @@ export class DynamicFormComponent implements OnInit {
     this.structure$
       .pipe(
         map(this.formBuilder),
-        tap((f) => (this.form = f)),
-        tap((f) => this.listenFormChanges(f)),
-        (f$) => combineLatest([f$, this.data$]),
+        tap(f => (this.form = f)),
+        tap(f => this.listenFormChanges(f)),
+        f$ => combineLatest([f$, this.data$]),
+        tap(([, data]) => data && (this.data = data)),
         untilDestroyed(this),
       )
       .subscribe(this.patchValue);
@@ -39,16 +41,16 @@ export class DynamicFormComponent implements OnInit {
     if (this.touchedForm$) {
       this.touchedForm$
         .pipe(
-          filter((t) => !t && !!this.form),
+          filter(t => !t && !!this.form),
           untilDestroyed(this),
         )
-        .subscribe((_) => this.form.reset());
+        .subscribe(_ => this.form.reset());
     }
   }
 
   private formBuilder = (structure: Field[]): FormGroup => {
     const group = this.fb.group({});
-    structure.forEach((field) => group.addControl(field.name, this.control(field)));
+    structure.forEach(field => group.addControl(field.name, this.control(field)));
     return group;
   };
 
@@ -63,6 +65,6 @@ export class DynamicFormComponent implements OnInit {
   private listenFormChanges(form: FormGroup) {
     form.valueChanges
       .pipe(debounceTime(100), untilDestroyed(this))
-      .subscribe((changes: any) => this.updateForm.emit(changes));
+      .subscribe((changes: any) => this.updateForm.emit({ ...this.data, ...changes }));
   }
 }

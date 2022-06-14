@@ -42,9 +42,7 @@ export class ArticleListComponent {
   listConfig$ = this.store.listConfig$;
   isLoading$ = this.store.isLoading$;
 
-  constructor(private facade: ArticlesFacade, private router: Router, private route: ActivatedRoute) {
-    this.isLoading$.subscribe(a => console.log('this.isLoading', a));
-  }
+  constructor(private facade: ArticlesFacade, private router: Router, private route: ActivatedRoute) {}
 
   navigateToArticle(slug: string) {
     this.router.navigate(['/article', slug]);

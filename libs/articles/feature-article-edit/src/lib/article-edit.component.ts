@@ -3,10 +3,10 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ArticlesFacade } from '@realworld/articles/data-access';
+import { articleInitialState } from '@realworld/articles/data-access/src/lib/+state/article/article.adapter';
 import { DynamicFormComponent, Field, ListErrorsComponent, NgrxFormsFacade } from '@realworld/core/forms';
-import { formsAdapter, formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
-import { Adapt } from '@state-adapt/ngrx';
-import { map, publishReplay, refCount, switchMap } from 'rxjs';
+import { formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
+import { joinSelectors } from '@state-adapt/core';
 
 const structure: Field[] = [
   {
@@ -35,6 +35,8 @@ const structure: Field[] = [
   },
 ];
 
+const initialState = { ...formsInitialState, structure, data: articleInitialState.data };
+
 @Component({
   selector: 'app-article-edit',
   standalone: true,
@@ -44,30 +46,22 @@ const structure: Field[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticleEditComponent implements OnInit, OnDestroy {
-  store$ = this.facade.article$.pipe(
-    map(article => {
-      const initialState = { ...formsInitialState, structure, data: article };
-      const error$ = this.facade.publishArticleRequest.error$.pipe(
-        map(action => ({ ...action, payload: { error: action.payload } })),
-      );
-      return this.ngrxFormsFacade.createFormStore('articleEdit', initialState, error$);
-    }),
-    publishReplay(1),
-    refCount(),
+  storeContainer = this.ngrxFormsFacade.createFormStore(
+    'articleEdit',
+    initialState,
+    this.facade.publishArticleRequestError$,
   );
-  sources$ = this.store$.pipe(map(store => store.sources));
-  errors$ = this.store$.pipe(switchMap(store => store.store.errors$));
+  sources = this.storeContainer.sources;
 
-  spyStore = this.adapt.spy('articleEdit.form', formsAdapter);
-  structure$ = this.spyStore.structure$;
-  data$ = this.spyStore.data$;
+  errors$ = this.storeContainer.store.errors$;
+  structure$ = this.storeContainer.store.structure$;
+  data$ = joinSelectors(
+    [this.facade.articleStore, 'article'],
+    [this.storeContainer.store, 'data'],
+    (article, formData) => (formData !== articleInitialState.data ? formData : article),
+  ).state$;
 
-  constructor(
-    private adapt: Adapt,
-    private ngrxFormsFacade: NgrxFormsFacade,
-    public facade: ArticlesFacade,
-    private route: ActivatedRoute,
-  ) {}
+  constructor(private ngrxFormsFacade: NgrxFormsFacade, public facade: ArticlesFacade, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.facade.articleSlugUpdate$.next(this.route.snapshot.params['slug']);

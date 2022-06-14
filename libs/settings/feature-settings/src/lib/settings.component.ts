@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthFacade } from '@realworld/auth/data-access';
+import { authInitialState } from '@realworld/auth/data-access/src/lib/+state/auth.adapter';
 import { DynamicFormComponent, Field, ListErrorsComponent, NgrxFormsFacade } from '@realworld/core/forms';
-import { formsAdapter, formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
+import { formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
 import { SettingsService } from '@realworld/settings/data-access/src';
-import { getHttpSources } from '@state-adapt/core';
-import { Adapt } from '@state-adapt/ngrx';
-import { concatMap, map, of, publishReplay, refCount, Subject, switchMap, tap, withLatestFrom } from 'rxjs';
+import { getHttpSources, joinSelectors } from '@state-adapt/core';
+import { concatMap, map, Subject, tap, withLatestFrom } from 'rxjs';
 
 const structure: Field[] = [
   {
@@ -46,6 +46,8 @@ const structure: Field[] = [
   },
 ];
 
+const initialState = { ...formsInitialState, structure, data: authInitialState };
+
 @Component({
   standalone: true,
   selector: 'app-settings',
@@ -76,22 +78,15 @@ export class SettingsComponent {
   );
   submitRequest = getHttpSources('Settings', this.submitRequest$, res => [!!res, res, 'No response']);
 
-  store$ = this.authFacade.user$.pipe(
-    map(user => {
-      const initialState = { ...formsInitialState, structure, data: user };
-      const error$ = this.submitRequest.error$.pipe(map(action => ({ ...action, payload: { error: action.payload } })));
-      return this.ngrxFormsFacade.createFormStore('settings', initialState, error$);
-    }),
-    publishReplay(1),
-    refCount(),
-  );
-  sources$ = this.store$.pipe(map(store => store.sources));
+  error$ = this.submitRequest.error$.pipe(map(action => ({ ...action, payload: { error: action.payload } })));
+  storeContainer = this.ngrxFormsFacade.createFormStore('settings', initialState, this.error$);
 
-  spyStore = this.adapt.spy('settings.form', formsAdapter);
-
-  errors$ = this.store$.pipe(switchMap(store => store.store.errors$));
-  structure$ = this.spyStore.structure$;
-  data$ = this.spyStore.data$;
+  sources = this.storeContainer.sources;
+  errors$ = this.storeContainer.store.errors$;
+  structure$ = this.storeContainer.store.structure$;
+  data$ = joinSelectors([this.authFacade.store, 'user'], [this.storeContainer.store, 'data'], (user, formUser) =>
+    formUser.username ? formUser : user,
+  ).state$;
 
   logout$ = this.authFacade.logout$;
 
@@ -100,6 +95,5 @@ export class SettingsComponent {
     private settingsService: SettingsService,
     private authFacade: AuthFacade,
     private ngrxFormsFacade: NgrxFormsFacade,
-    private adapt: Adapt,
   ) {}
 }
