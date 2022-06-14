@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthFacade } from '@realworld/auth/data-access/src';
 import { Article } from '@realworld/core/api-types/src';
-import { Action, getHttpSources, joinSelectors, Source } from '@state-adapt/core';
+import { Action, getHttpActions, getHttpSources, joinSelectors, Source, splitHttpSources } from '@state-adapt/core';
 import { Adapt } from '@state-adapt/ngrx';
 import { BehaviorSubject, concatMap, exhaustMap, filter, map, Observable, switchMap, tap } from 'rxjs';
 import { ActionsService } from '../services/actions.service';
@@ -39,6 +39,9 @@ export class ArticlesFacade {
   );
   publishArticleSuccess$ = this.publishArticleRequest.success$.pipe(
     tap(({ payload }) => this.router.navigate(['article', payload.slug])),
+  );
+  publishArticleRequestError$ = this.publishArticleRequest.error$.pipe(
+    map(action => ({ ...action, payload: { error: action.payload } })),
   );
 
   deleteArticle$ = new Source<string>('[Article] deleteArticle$');
@@ -101,7 +104,7 @@ export class ArticlesFacade {
   );
 
   articleStore = this.adapt.init(['article2', articleAdapter, articleInitialState], {
-    receiveArticle: this.articleRequest.success$.pipe(tap(console.log)),
+    receiveArticle: this.articleRequest.success$,
     resetArticle: this.articleRequest.error$,
     receiveComments: this.commentsRequest.success$,
     resetComments: this.commentsRequest.error$,
@@ -147,8 +150,10 @@ export class ArticlesFacade {
     (loggedIn, config) =>
       config?.type !== 'DEFAULT' ? config : { ...config, type: (loggedIn ? 'FEED' : 'ALL') as ListType },
   ).state$;
-  articleListRequest$ = this.listConfig$.pipe(switchMap(config => this.articlesService.query(config)));
-  articleListRequest = getHttpSources('[Article List]', this.articleListRequest$, res => [!!res, res, 'Error']);
+  articleListRequest$ = this.listConfig$.pipe(
+    switchMap(config => getHttpActions(this.articlesService.query(config), res => [!!res, res, 'Error'])),
+  );
+  articleListRequest = splitHttpSources('[Article List]', this.articleListRequest$);
 
   constructor(
     private router: Router,
