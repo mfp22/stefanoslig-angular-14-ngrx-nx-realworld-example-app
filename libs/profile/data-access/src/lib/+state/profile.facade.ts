@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActionsService } from '@realworld/articles/data-access/src';
-import { ApiService } from '@realworld/core/http-client/src';
-import { Action, getHttpSources, Source } from '@state-adapt/core';
-import { Adapt } from '@state-adapt/ngrx';
+import { Action, AdaptCommon, getHttpSources, Source } from '@state-adapt/core';
 import { concatMap, Observable, switchMap, withLatestFrom } from 'rxjs';
 import { ProfileService } from '../profile.service';
 import { profileAdapter, profileInitialState } from './profile.adapter';
@@ -10,10 +8,9 @@ import { profileAdapter, profileInitialState } from './profile.adapter';
 @Injectable({ providedIn: 'root' })
 export class ProfileFacade {
   constructor(
-    private adapt: Adapt,
+    private adapt: AdaptCommon<any>,
     private actionsService: ActionsService,
     private profileService: ProfileService,
-    private apiService: ApiService,
   ) {}
 
   createProfileStore(username$: Observable<string>) {

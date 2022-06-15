@@ -2,9 +2,16 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthFacade } from '@realworld/auth/data-access/src';
 import { Article } from '@realworld/core/api-types/src';
-import { Action, getHttpActions, getHttpSources, joinSelectors, Source, splitHttpSources } from '@state-adapt/core';
-import { Adapt } from '@state-adapt/ngrx';
-import { BehaviorSubject, concatMap, exhaustMap, filter, map, Observable, switchMap, tap } from 'rxjs';
+import {
+  Action,
+  AdaptCommon,
+  getHttpActions,
+  getHttpSources,
+  joinSelectors,
+  Source,
+  splitHttpSources,
+} from '@state-adapt/core';
+import { BehaviorSubject, concatMap, exhaustMap, filter, map, Observable, share, switchMap, tap } from 'rxjs';
 import { ActionsService } from '../services/actions.service';
 import { ArticlesService } from '../services/articles.service';
 import {
@@ -103,7 +110,7 @@ export class ArticlesFacade {
     res => [!!res, res.article, 'Error'],
   );
 
-  articleStore = this.adapt.init(['article2', articleAdapter, articleInitialState], {
+  articleStore = this.adapt.init(['article', articleAdapter, articleInitialState], {
     receiveArticle: this.articleRequest.success$,
     resetArticle: this.articleRequest.error$,
     receiveComments: this.commentsRequest.success$,
@@ -157,7 +164,7 @@ export class ArticlesFacade {
 
   constructor(
     private router: Router,
-    private adapt: Adapt,
+    private adapt: AdaptCommon<any>,
     private articlesService: ArticlesService,
     private actionsService: ActionsService,
     private authFacade: AuthFacade,

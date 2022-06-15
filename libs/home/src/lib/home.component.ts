@@ -3,8 +3,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { ArticlesFacade } from '@realworld/articles/data-access';
 import { ArticleListComponent } from '@realworld/articles/feature-articles-list/src';
-import { getHttpSources } from '@state-adapt/core';
-import { Adapt } from '@state-adapt/ngrx';
+import { AdaptCommon, getHttpSources } from '@state-adapt/core';
 import { Subject } from 'rxjs';
 import { homeAdapter } from './home.adapter';
 import { homeInitialState } from './home.model';
@@ -35,5 +34,9 @@ export class HomeComponent {
   });
   tags$ = this.homeStore.tags$;
 
-  constructor(private adapt: Adapt, private articlesfacade: ArticlesFacade, private homeService: HomeService) {}
+  constructor(
+    private adapt: AdaptCommon<any>,
+    private articlesfacade: ArticlesFacade,
+    private homeService: HomeService,
+  ) {}
 }

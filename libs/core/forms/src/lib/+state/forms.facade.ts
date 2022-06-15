@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Action, Source } from '@state-adapt/core';
-import { Adapt } from '@state-adapt/ngrx';
+import { Action, AdaptCommon, Source } from '@state-adapt/core';
 import { Observable } from 'rxjs';
 import { formsAdapter, FormsState } from './forms.adapter';
 import { Errors } from './forms.interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class NgrxFormsFacade {
-  constructor(private adapt: Adapt) {}
+  constructor(private adapt: AdaptCommon<any>) {}
 
   createFormStore(featureName: string, initialState: FormsState, errors$?: Observable<Action<Errors>>) {
     const sources = {

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { getHttpSources, Source, toSource } from '@state-adapt/core';
-import { Adapt } from '@state-adapt/ngrx';
+import { AdaptCommon, getHttpSources, Source, toSource } from '@state-adapt/core';
 import { exhaustMap, Subject, tap } from 'rxjs';
 import { filter, map, mergeWith, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
@@ -59,7 +58,7 @@ export class AuthFacade {
   isLoggedIn$ = this.store.loggedIn$;
 
   constructor(
-    private adapt: Adapt,
+    private adapt: AdaptCommon<any>,
     private authService: AuthService,
     private localStorageJwtService: LocalStorageJwtService,
     private router: Router,

@@ -3,10 +3,6 @@ import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
-import { EffectsModule } from '@ngrx/effects';
-import { StoreRouterConnectingModule } from '@ngrx/router-store';
-import { StoreModule } from '@ngrx/store';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import {
   actionSanitizer,
   stateSanitizer,
@@ -15,6 +11,8 @@ import {
   AdaptModel,
   isPatchState,
   updatePaths,
+  AdaptCommon,
+  createStore,
 } from '@state-adapt/core';
 import { TokenInterceptorService } from '@realworld/auth/data-access';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -24,6 +22,11 @@ import { API_URL } from '@realworld/core/http-client';
 if (environment.production) {
   enableProdMode();
 }
+
+const enableReduxDevTools = (window as any).__REDUX_DEVTOOLS_EXTENSION__?.({
+  actionSanitizer,
+  stateSanitizer,
+});
 
 const rootInterceptors = [
   {
@@ -86,12 +89,9 @@ bootstrapApplication(AppComponent, {
           relativeLinkResolution: 'legacy',
         },
       ),
-      StoreModule.forRoot({ adapt: adaptReducer }),
-      EffectsModule.forRoot([]),
-      !environment.production ? StoreDevtoolsModule.instrument({ actionSanitizer, stateSanitizer }) : [],
-      StoreRouterConnectingModule.forRoot(),
     ),
     { provide: API_URL, useValue: environment.api_url },
+    { provide: AdaptCommon, useValue: createStore(enableReduxDevTools) },
     ...rootInterceptors,
   ],
 }).catch(err => console.log(err));
