@@ -45,7 +45,7 @@
     "@ngrx/router-store": "13.2.0",
     "@ngrx/store": "13.2.0",
     "@nrwl/angular": "14.2.4",
-    "@state-adapt/core": "^0.44.0",
+    "@state-adapt/core": "^0.46.0",
     "core-js": "^2.5.4",
     "eslint-plugin-ngrx": "^2.0.3",
     "lodash-es": "^4.17.21",
