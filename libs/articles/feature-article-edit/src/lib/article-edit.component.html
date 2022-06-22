@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-md-10 offset-md-1 col-xs-12">
         <app-list-errors [errors]="errors$ | async"></app-list-errors>
-        <app-dynamic-form (updateForm)="sources.formUpdate$.next($event)" [data$]="data$" [structure$]="structure$">
+        <app-dynamic-form (updateForm)="store.updateData($event)" [data$]="data$" [structure$]="structure$">
         </app-dynamic-form>
 
         <button

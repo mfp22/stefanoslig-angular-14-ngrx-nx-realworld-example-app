@@ -44,7 +44,7 @@
           [currentUser]="currentUser$ | async"
           [touchedForm$]="touched$"
           (submitComment)="facade.addComment$.next({ slug: $event, comment: data.comment })"
-          (updateForm)="sources.formUpdate$.next($event)"
+          (updateForm)="store.updateData($event)"
         >
         </app-add-comment>
 

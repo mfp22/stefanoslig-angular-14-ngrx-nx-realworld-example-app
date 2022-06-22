@@ -43,12 +43,12 @@ export class ArticleComponent implements OnInit, OnDestroy {
   isAuthenticated$ = this.authFacade.isLoggedIn$;
   currentUser$ = this.authFacade.user$;
 
-  store = this.ngrxFormsFacade.createFormStore('comment', initialState, this.facade.addCommentError$);
-  sources = this.store.sources;
-  structure$ = this.store.store.structure$;
-  data$ = this.store.store.data$;
-  errors$ = this.store.store.errors$;
-  touched$ = this.store.store.touched$;
+  storeContainer = this.ngrxFormsFacade.createFormStore('comment', initialState, this.facade.addCommentError$);
+  store = this.storeContainer.store;
+  structure$ = this.store.structure$;
+  data$ = this.store.data$;
+  errors$ = this.store.errors$;
+  touched$ = this.store.touched$;
 
   constructor(
     private ngrxFormsFacade: NgrxFormsFacade,

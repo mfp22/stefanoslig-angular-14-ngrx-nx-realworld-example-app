@@ -9,7 +9,7 @@
 
         <app-list-errors [errors]="errors$ | async"></app-list-errors>
 
-        <app-dynamic-form (updateForm)="sources.formUpdate$.next($event)" [data$]="data$" [structure$]="structure$">
+        <app-dynamic-form (updateForm)="store.updateData($event)" [data$]="data$" [structure$]="structure$">
         </app-dynamic-form>
         <button
           *ngIf="data$ | async; let data"

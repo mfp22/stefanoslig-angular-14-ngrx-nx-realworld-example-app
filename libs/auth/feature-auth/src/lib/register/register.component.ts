@@ -41,11 +41,11 @@ const initialState = { ...formsInitialState, structure };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
-  store = this.ngrxFormsFacade.createFormStore('register', initialState, this.facade.loginOrRegisterError$);
-  sources = this.store.sources;
-  structure$ = this.store.store.structure$;
-  data$ = this.store.store.data$;
-  errors$ = this.store.store.errors$;
+  storeContainer = this.ngrxFormsFacade.createFormStore('register', initialState, this.facade.loginOrRegisterError$);
+  store = this.storeContainer.store;
+  structure$ = this.store.structure$;
+  data$ = this.store.data$;
+  errors$ = this.store.errors$;
 
   submit$ = this.facade.registerRequest$;
 

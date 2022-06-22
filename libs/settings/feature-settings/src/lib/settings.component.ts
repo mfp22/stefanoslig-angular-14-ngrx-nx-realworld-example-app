@@ -81,10 +81,10 @@ export class SettingsComponent {
   error$ = this.submitRequest.error$.pipe(map(action => ({ ...action, payload: { error: action.payload } })));
   storeContainer = this.ngrxFormsFacade.createFormStore('settings', initialState, this.error$);
 
-  sources = this.storeContainer.sources;
-  errors$ = this.storeContainer.store.errors$;
-  structure$ = this.storeContainer.store.structure$;
-  data$ = joinSelectors([this.authFacade.store, 'user'], [this.storeContainer.store, 'data'], (user, formUser) =>
+  store = this.storeContainer.store;
+  errors$ = this.store.errors$;
+  structure$ = this.store.structure$;
+  data$ = joinSelectors([this.authFacade.store, 'user'], [this.store, 'data'], (user, formUser) =>
     formUser.username ? formUser : user,
   ).state$;
 

@@ -35,11 +35,11 @@ const initialState = { ...formsInitialState, structure };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
-  store = this.ngrxFormsFacade.createFormStore('login', initialState, this.facade.loginOrRegisterError$);
-  sources = this.store.sources;
-  structure$ = this.store.store.structure$;
-  data$ = this.store.store.data$;
-  errors$ = this.store.store.errors$;
+  storeContainer = this.ngrxFormsFacade.createFormStore('login', initialState, this.facade.loginOrRegisterError$);
+  store = this.storeContainer.store;
+  structure$ = this.store.structure$;
+  data$ = this.store.data$;
+  errors$ = this.store.errors$;
 
   submit$ = this.facade.loginRequest$;
 

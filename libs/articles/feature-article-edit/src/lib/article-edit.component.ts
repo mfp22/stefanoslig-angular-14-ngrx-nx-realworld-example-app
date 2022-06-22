@@ -51,7 +51,7 @@ export class ArticleEditComponent implements OnInit, OnDestroy {
     initialState,
     this.facade.publishArticleRequestError$,
   );
-  sources = this.storeContainer.sources;
+  store = this.storeContainer.store;
 
   errors$ = this.storeContainer.store.errors$;
   structure$ = this.storeContainer.store.structure$;

@@ -9,15 +9,9 @@ export class NgrxFormsFacade {
   constructor(private adapt: AdaptCommon) {}
 
   createFormStore(featureName: string, initialState: FormsState, errors$?: Observable<Action<Errors>>) {
-    const sources = {
-      formUpdate$: new Source<any>(`[${featureName}] formUpdate$`),
-      setUntouched$: new Source<void>(`[${featureName}] setUntouched$`),
-      errors$,
-    };
+    const sources = { errors$ };
 
     const store = this.adapt.init([`${featureName}.form`, formsAdapter, initialState], {
-      updateData: sources.formUpdate$,
-      setUntouched: sources.setUntouched$,
       setErrors: sources.errors$ || [],
     });
 
