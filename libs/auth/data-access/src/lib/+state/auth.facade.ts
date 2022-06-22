@@ -58,7 +58,7 @@ export class AuthFacade {
   isLoggedIn$ = this.store.loggedIn$;
 
   constructor(
-    private adapt: AdaptCommon<any>,
+    private adapt: AdaptCommon,
     private authService: AuthService,
     private localStorageJwtService: LocalStorageJwtService,
     private router: Router,

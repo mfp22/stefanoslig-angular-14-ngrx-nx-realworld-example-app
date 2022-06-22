@@ -4,15 +4,12 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
 import {
-  actionSanitizer,
-  stateSanitizer,
   PatchState,
   CommonAction,
   AdaptModel,
   isPatchState,
   updatePaths,
-  AdaptCommon,
-  createStore,
+  defaultStoreProvider,
 } from '@state-adapt/core';
 import { TokenInterceptorService } from '@realworld/auth/data-access';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -22,11 +19,6 @@ import { API_URL } from '@realworld/core/http-client';
 if (environment.production) {
   enableProdMode();
 }
-
-const enableReduxDevTools = (window as any).__REDUX_DEVTOOLS_EXTENSION__?.({
-  actionSanitizer,
-  stateSanitizer,
-});
 
 const rootInterceptors = [
   {
@@ -91,7 +83,7 @@ bootstrapApplication(AppComponent, {
       ),
     ),
     { provide: API_URL, useValue: environment.api_url },
-    { provide: AdaptCommon, useValue: createStore(enableReduxDevTools) },
+    defaultStoreProvider,
     ...rootInterceptors,
   ],
 }).catch(err => console.log(err));

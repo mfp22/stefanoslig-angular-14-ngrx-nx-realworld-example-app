@@ -14,5 +14,5 @@ export class ErrorHandlerFacade {
 
   state$ = this.adapt.setter('errorHandler', errorHandlerInitialState, [this.error401Source$, this.error404Source$]);
 
-  constructor(private adapt: AdaptCommon<any>, private router: Router) {}
+  constructor(private adapt: AdaptCommon, private router: Router) {}
 }

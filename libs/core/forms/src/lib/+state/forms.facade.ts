@@ -6,7 +6,7 @@ import { Errors } from './forms.interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class NgrxFormsFacade {
-  constructor(private adapt: AdaptCommon<any>) {}
+  constructor(private adapt: AdaptCommon) {}
 
   createFormStore(featureName: string, initialState: FormsState, errors$?: Observable<Action<Errors>>) {
     const sources = {

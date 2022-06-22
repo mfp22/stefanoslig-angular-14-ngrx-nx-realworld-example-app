@@ -34,9 +34,5 @@ export class HomeComponent {
   });
   tags$ = this.homeStore.tags$;
 
-  constructor(
-    private adapt: AdaptCommon<any>,
-    private articlesfacade: ArticlesFacade,
-    private homeService: HomeService,
-  ) {}
+  constructor(private adapt: AdaptCommon, private articlesfacade: ArticlesFacade, private homeService: HomeService) {}
 }

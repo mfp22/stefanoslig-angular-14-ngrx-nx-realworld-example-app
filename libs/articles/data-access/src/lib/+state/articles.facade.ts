@@ -164,7 +164,7 @@ export class ArticlesFacade {
 
   constructor(
     private router: Router,
-    private adapt: AdaptCommon<any>,
+    private adapt: AdaptCommon,
     private articlesService: ArticlesService,
     private actionsService: ActionsService,
     private authFacade: AuthFacade,

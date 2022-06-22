@@ -8,7 +8,7 @@ import { profileAdapter, profileInitialState } from './profile.adapter';
 @Injectable({ providedIn: 'root' })
 export class ProfileFacade {
   constructor(
-    private adapt: AdaptCommon<any>,
+    private adapt: AdaptCommon,
     private actionsService: ActionsService,
     private profileService: ProfileService,
   ) {}
