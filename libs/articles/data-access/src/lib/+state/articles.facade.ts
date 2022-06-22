@@ -121,6 +121,7 @@ export class ArticlesFacade {
     setArticle: [this.favoriteRequest.success$, this.unfavoriteRequest.success$],
     noop: [
       this.articleRequest.request$ as Observable<Action<any>>,
+      this.publishArticle$,
       this.publishArticleSuccess$,
       this.deleteArticle$,
       this.deleteArticleRequest.error$,
