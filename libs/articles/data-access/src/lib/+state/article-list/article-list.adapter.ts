@@ -63,7 +63,10 @@ export const articleListAdapter = createAdapter<ArticleListState>()({
     return { ...state, listConfig };
   },
   setListConfig: (state, listConfig: ArticleListConfig) => ({ ...state, listConfig }),
-  setListType: (state, type: ListType = 'ALL') => ({ ...state, listConfig: { ...state.listConfig, type } }),
+  setListType: (state, type: ListType = 'ALL') => ({
+    ...state,
+    listConfig: { ...state.listConfig, type, filters: initialListConfig.filters },
+  }),
   setListTag: (state, tag: string) => ({
     ...state,
     listConfig: { ...state.listConfig, filters: { ...state.listConfig.filters, tag } },
