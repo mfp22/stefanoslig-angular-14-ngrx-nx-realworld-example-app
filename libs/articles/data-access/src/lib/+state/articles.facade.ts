@@ -176,6 +176,7 @@ export class ArticlesFacade {
       setListType: this.listChange$,
       setListPage: this.listPageChange$,
       setListConfig: this.listConfigChange$,
+      setListTag: this.listTagChange$,
       awaitArticles: this.articleListRequest.request$ as Observable<Action<any>>,
       receiveArticles: this.articleListRequest.success$,
       articlesError: this.articleListRequest.error$,
