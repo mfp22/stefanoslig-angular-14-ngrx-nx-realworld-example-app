@@ -2,16 +2,9 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthFacade } from '@realworld/auth/data-access/src';
 import { Article } from '@realworld/core/api-types/src';
-import {
-  Action,
-  AdaptCommon,
-  getHttpActions,
-  getHttpSources,
-  joinSelectors,
-  Source,
-  splitHttpSources,
-} from '@state-adapt/core';
-import { BehaviorSubject, concatMap, exhaustMap, filter, map, Observable, share, switchMap, tap } from 'rxjs';
+import { adapt, watch } from '@state-adapt/angular';
+import { Action, getHttpActions, getHttpSources, joinSelectors, Source, splitHttpSources } from '@state-adapt/core';
+import { BehaviorSubject, concatMap, exhaustMap, filter, map, Observable, switchMap, tap } from 'rxjs';
 import { ActionsService } from '../services/actions.service';
 import { ArticlesService } from '../services/articles.service';
 import {
@@ -110,7 +103,7 @@ export class ArticlesFacade {
     res => [!!res, res.article, 'Error'],
   );
 
-  articleStore = this.adapt.init(['article', articleAdapter, articleInitialState], {
+  articleStore = adapt(['article', articleInitialState, articleAdapter], {
     receiveArticle: this.articleRequest.success$,
     resetArticle: this.articleRequest.error$,
     receiveComments: this.commentsRequest.success$,
@@ -151,7 +144,7 @@ export class ArticlesFacade {
   listPageChange$ = new Source<number>('[Article List] listPageChange$');
   listConfigChange$ = new Source<ArticleListConfig>('[Article List] listConfigChange$');
 
-  listConfigSpy = this.adapt.spy('articleList', articleListAdapter);
+  listConfigSpy = watch('articleList', articleListAdapter);
   listConfig$ = joinSelectors(
     [this.authFacade.store, 'loggedIn'],
     [this.listConfigSpy, 'listConfig'],
@@ -165,7 +158,6 @@ export class ArticlesFacade {
 
   constructor(
     private router: Router,
-    private adapt: AdaptCommon,
     private articlesService: ArticlesService,
     private actionsService: ActionsService,
     private authFacade: AuthFacade,
@@ -173,7 +165,7 @@ export class ArticlesFacade {
 
   createArticleListStore(listConfig: ArticleListConfig = initialListConfig) {
     const initialState: ArticleListState = { ...articleListInitialState, listConfig };
-    return this.adapt.init(['articleList', articleListAdapter, initialState], {
+    return adapt(['articleList', initialState, articleListAdapter], {
       setListType: this.listChange$,
       setListPage: this.listPageChange$,
       setListConfig: this.listConfigChange$,

@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
 import { ActionsService } from '@realworld/articles/data-access/src';
-import { Action, AdaptCommon, getHttpSources, Source } from '@state-adapt/core';
+import { adapt, watch } from '@state-adapt/angular';
+import { Action, getHttpSources, Source } from '@state-adapt/core';
 import { concatMap, Observable, switchMap, withLatestFrom } from 'rxjs';
 import { ProfileService } from '../profile.service';
 import { profileAdapter, profileInitialState } from './profile.adapter';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileFacade {
-  constructor(
-    private adapt: AdaptCommon,
-    private actionsService: ActionsService,
-    private profileService: ProfileService,
-  ) {}
+  constructor(private actionsService: ActionsService, private profileService: ProfileService) {}
 
   createProfileStore(username$: Observable<string>) {
     const path = 'profile';
@@ -23,7 +20,7 @@ export class ProfileFacade {
       followToggleRequest$: new Source<string>('[Profile] followToggleRequest$'),
     };
 
-    const spyFollowing$ = this.adapt.spy(path, profileAdapter).following$;
+    const spyFollowing$ = watch(path, profileAdapter).following$;
     const followToggle$ = sources.followToggleRequest$.pipe(
       withLatestFrom(spyFollowing$),
       concatMap(([{ payload: username }, following]) =>
@@ -36,7 +33,7 @@ export class ProfileFacade {
       'Error',
     ]);
 
-    const store = this.adapt.init([path, profileAdapter, profileInitialState], {
+    const store = adapt([path, profileInitialState, profileAdapter], {
       request: profileRequest.request$ as Observable<Action<any>>,
       receive: profileRequest.success$,
       reset: profileRequest.error$,

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AdaptCommon, getHttpSources, Source, toSource } from '@state-adapt/core';
+import { adapt } from '@state-adapt/angular';
+import { getHttpSources, Source, toSource } from '@state-adapt/core';
 import { exhaustMap, Subject, tap } from 'rxjs';
 import { filter, map, mergeWith, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
@@ -46,7 +47,7 @@ export class AuthFacade {
     toSource('[Auth] logout$'),
   );
 
-  store = this.adapt.init(['auth', authAdapter, authInitialState], {
+  store = adapt(['auth', authInitialState, authAdapter], {
     receiveUser: [this.userRequest.success$, this.loginOrRegisterSuccess$],
     setInProgress: [this.loginRequest$, this.registerRequest$],
     resetStatus: [this.loginOrRegisterSuccess$, this.loginOrRegisterError$],
@@ -58,7 +59,6 @@ export class AuthFacade {
   isLoggedIn$ = this.store.loggedIn$;
 
   constructor(
-    private adapt: AdaptCommon,
     private authService: AuthService,
     private localStorageJwtService: LocalStorageJwtService,
     private router: Router,

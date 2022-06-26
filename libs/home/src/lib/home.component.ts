@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { ArticlesFacade } from '@realworld/articles/data-access';
 import { ArticleListComponent } from '@realworld/articles/feature-articles-list/src';
-import { AdaptCommon, getHttpSources } from '@state-adapt/core';
+import { adapt } from '@state-adapt/angular';
+import { getHttpSources } from '@state-adapt/core';
 import { Subject } from 'rxjs';
 import { homeAdapter } from './home.adapter';
 import { homeInitialState } from './home.model';
@@ -28,11 +29,11 @@ export class HomeComponent {
   unsubscribe$: Subject<void> = new Subject();
 
   tagsRequest = getHttpSources('[Home] [Tags]', this.homeService.getTags(), res => [true, res.tags, res]);
-  homeStore = this.adapt.init(['home', homeAdapter, homeInitialState], {
+  homeStore = adapt(['home', homeInitialState, homeAdapter], {
     setTags: this.tagsRequest.success$,
     resetTags: this.tagsRequest.error$,
   });
   tags$ = this.homeStore.tags$;
 
-  constructor(private adapt: AdaptCommon, private articlesfacade: ArticlesFacade, private homeService: HomeService) {}
+  constructor(private articlesfacade: ArticlesFacade, private homeService: HomeService) {}
 }
