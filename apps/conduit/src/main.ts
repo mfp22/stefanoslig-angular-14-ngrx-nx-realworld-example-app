@@ -3,14 +3,7 @@ import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
-import {
-  PatchState,
-  CommonAction,
-  AdaptModel,
-  isPatchState,
-  updatePaths,
-  defaultStoreProvider,
-} from '@state-adapt/core';
+import { defaultStoreProvider } from '@state-adapt/core';
 import { TokenInterceptorService } from '@realworld/auth/data-access';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ErrorHandlerInterceptorService } from '@realworld/core/error-handler';
@@ -87,7 +80,3 @@ bootstrapApplication(AppComponent, {
     ...rootInterceptors,
   ],
 }).catch(err => console.log(err));
-
-export function adaptReducer(state: any = {}, action: PatchState | CommonAction): AdaptModel {
-  return isPatchState(action) ? updatePaths(state, action.payload) : state;
-}
