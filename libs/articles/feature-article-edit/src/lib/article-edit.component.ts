@@ -6,7 +6,7 @@ import { ArticlesFacade } from '@realworld/articles/data-access';
 import { articleInitialState } from '@realworld/articles/data-access/src/lib/+state/article/article.adapter';
 import { DynamicFormComponent, Field, ListErrorsComponent, NgrxFormsFacade } from '@realworld/core/forms';
 import { formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
-import { joinSelectors } from '@state-adapt/core';
+import { joinStores } from '@state-adapt/rxjs';
 
 const structure: Field[] = [
   {
@@ -55,11 +55,9 @@ export class ArticleEditComponent implements OnInit, OnDestroy {
 
   errors$ = this.storeContainer.store.errors$;
   structure$ = this.storeContainer.store.structure$;
-  data$ = joinSelectors(
-    [this.facade.articleStore, 'article'],
-    [this.storeContainer.store, 'data'],
-    (article, formData) => (formData !== articleInitialState.data ? formData : article),
-  ).state$;
+  data$ = joinStores({ article: this.facade.articleStore, form: this.store })({
+    data: s => (s.form.data !== articleInitialState.data ? s.form.data : s.article.data),
+  })().data$;
 
   constructor(private ngrxFormsFacade: NgrxFormsFacade, public facade: ArticlesFacade, private route: ActivatedRoute) {}
 

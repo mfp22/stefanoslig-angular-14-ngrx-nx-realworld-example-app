@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { getHttpSources, Source, toSource } from '@state-adapt/rxjs';
 import { adapt } from '@state-adapt/angular';
-import { getHttpSources, Source, toSource } from '@state-adapt/core';
 import { exhaustMap, Subject, tap } from 'rxjs';
 import { filter, map, mergeWith, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';

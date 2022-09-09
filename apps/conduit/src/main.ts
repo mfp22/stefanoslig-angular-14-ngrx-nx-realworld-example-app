@@ -3,7 +3,7 @@ import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
-import { defaultStoreProvider } from '@state-adapt/core';
+import { defaultStoreProvider } from '@state-adapt/angular';
 import { TokenInterceptorService } from '@realworld/auth/data-access';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ErrorHandlerInterceptorService } from '@realworld/core/error-handler';

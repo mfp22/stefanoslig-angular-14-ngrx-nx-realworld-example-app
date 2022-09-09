@@ -7,7 +7,7 @@ import { authInitialState } from '@realworld/auth/data-access/src/lib/+state/aut
 import { DynamicFormComponent, Field, ListErrorsComponent, NgrxFormsFacade } from '@realworld/core/forms';
 import { formsInitialState } from '@realworld/core/forms/src/lib/+state/forms.adapter';
 import { SettingsService } from '@realworld/settings/data-access/src';
-import { getHttpSources, joinSelectors } from '@state-adapt/core';
+import { getHttpSources, joinStores } from '@state-adapt/rxjs';
 import { concatMap, map, Subject, tap, withLatestFrom } from 'rxjs';
 
 const structure: Field[] = [
@@ -84,9 +84,9 @@ export class SettingsComponent {
   store = this.storeContainer.store;
   errors$ = this.store.errors$;
   structure$ = this.store.structure$;
-  data$ = joinSelectors([this.authFacade.store, 'user'], [this.store, 'data'], (user, formUser) =>
-    formUser.username ? formUser : user,
-  ).state$;
+  data$ = joinStores({ auth: this.authFacade.store, form: this.store })({
+    data: s => (s.form.data.username ? s.form.data : s.auth.user),
+  })().data$;
 
   logout$ = this.authFacade.logout$;
 

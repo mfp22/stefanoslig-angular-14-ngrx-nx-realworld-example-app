@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ActionsService } from '@realworld/articles/data-access/src';
+import { Action } from '@state-adapt/core';
+import { getHttpSources, Source } from '@state-adapt/rxjs';
 import { adapt, watch } from '@state-adapt/angular';
-import { Action, getHttpSources, Source } from '@state-adapt/core';
 import { concatMap, Observable, switchMap, withLatestFrom } from 'rxjs';
 import { ProfileService } from '../profile.service';
 import { profileAdapter, profileInitialState } from './profile.adapter';
