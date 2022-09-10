@@ -56,7 +56,7 @@ export class ArticleEditComponent implements OnInit, OnDestroy {
   errors$ = this.storeContainer.store.errors$;
   structure$ = this.storeContainer.store.structure$;
   data$ = joinStores({ article: this.facade.articleStore, form: this.store })({
-    data: s => (s.form.data !== articleInitialState.data ? s.form.data : s.article.data),
+    data: s => (s.formData !== articleInitialState.data ? s.formData : s.articleArticle),
   })().data$;
 
   constructor(private ngrxFormsFacade: NgrxFormsFacade, public facade: ArticlesFacade, private route: ActivatedRoute) {}
