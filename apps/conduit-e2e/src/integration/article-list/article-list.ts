@@ -22,7 +22,7 @@ And('I select the Global feed', () => {
 When('I click on the first article', () => {
   const firstArticle = cy.getByE2eId('article-list-title').first();
   firstArticle.then((title) => {
-    cy.wrap(title.text()).as('articleTitle');
+    cy.wrap(title.text().trim()).as('articleTitle');
     title.click();
   });
 });
@@ -42,7 +42,7 @@ When("I click on the first article's author name", () => {
   cy.getByE2eId('article-author')
     .first()
     .then((authorName) => {
-      cy.wrap(authorName.text()).as('author');
+      cy.wrap(authorName.text().trim()).as('author');
     });
   cy.getByE2eId('article-author').first().click();
 });
