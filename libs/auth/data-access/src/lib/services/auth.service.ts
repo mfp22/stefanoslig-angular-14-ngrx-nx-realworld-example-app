@@ -1,22 +1,47 @@
-import { ApiService } from '@realworld/core/http-client';
-import { UserResponse } from '@realworld/core/api-types';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { LoginUser, LoginUserRequest, NewUserRequest, NewUser } from '@realworld/core/api-types';
+import {
+  LoginUser,
+  LoginUserRequest,
+  NewUser,
+  NewUserRequest,
+  User,
+  UserResponse,
+} from '@realworld/core/api-types';
+import {
+  ApiService,
+  RequestObservable,
+} from '@realworld/core/http-client';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   constructor(private apiService: ApiService) {}
 
-  user(): Observable<UserResponse> {
+  user(): RequestObservable<UserResponse> {
     return this.apiService.get<UserResponse>('/user');
   }
 
-  login(credentials: LoginUser): Observable<UserResponse> {
-    return this.apiService.post<UserResponse, LoginUserRequest>('/users/login', { user: credentials });
+  login(
+    credentials: LoginUser,
+  ): RequestObservable<UserResponse> {
+    return this.apiService.post<UserResponse, LoginUserRequest>(
+      '/users/login',
+      { user: credentials },
+    );
   }
 
-  register(credentials: NewUser): Observable<UserResponse> {
-    return this.apiService.post<UserResponse, NewUserRequest>('/users', { user: credentials });
+  register(
+    credentials: NewUser,
+  ): RequestObservable<UserResponse> {
+    return this.apiService.post<UserResponse, NewUserRequest>(
+      '/users',
+      { user: credentials },
+    );
+  }
+
+  update(user: User): RequestObservable<UserResponse> {
+    return this.apiService.put<UserResponse, UserResponse>(
+      '/user',
+      { user },
+    );
   }
 }

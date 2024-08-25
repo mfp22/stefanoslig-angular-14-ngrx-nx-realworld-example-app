@@ -7,11 +7,23 @@
           <a [routerLink]="['/register']">Need an account?</a>
         </p>
 
-        <cdt-list-errors></cdt-list-errors>
+        <cdt-list-errors
+          [errors]="store.errors()"
+        ></cdt-list-errors>
 
-        <cdt-dynamic-form (updateForm)="updateForm($event)" [data$]="data$" [structure$]="structure$">
+        <cdt-dynamic-form
+          (updateForm)="store.dataUpdate$.next($event)"
+          [data]="store.data()"
+          [structure]="store.structure()"
+        >
         </cdt-dynamic-form>
-        <button data-e2e-id="sign-in" (click)="submit()" class="btn btn-lg btn-primary pull-xs-right" type="submit">
+        <button
+          data-e2e-id="sign-in"
+          (click)="store.login$.next()"
+          class="btn btn-lg btn-primary pull-xs-right"
+          type="submit"
+          [disabled]="!store.valid()"
+        >
           Sign in
         </button>
       </div>

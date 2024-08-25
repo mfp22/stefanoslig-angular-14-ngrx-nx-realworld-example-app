@@ -1,14 +1,22 @@
-import { Profile, ProfileResponse } from '@realworld/core/api-types';
-import { ApiService } from '@realworld/core/http-client';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {
+  Profile,
+  ProfileResponse,
+} from '@realworld/core/api-types';
+import {
+  ApiService,
+  RequestObservable,
+} from '@realworld/core/http-client';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   constructor(private apiService: ApiService) {}
 
-  getProfile(username: string): Observable<Profile> {
-    return this.apiService.get<ProfileResponse>('/profiles/' + username).pipe(map((data) => data.profile));
+  getProfile(
+    username: string,
+  ): RequestObservable<{ profile: Profile }> {
+    return this.apiService.get<ProfileResponse>(
+      '/profiles/' + username,
+    );
   }
 }

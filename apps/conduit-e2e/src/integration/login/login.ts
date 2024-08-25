@@ -1,4 +1,9 @@
-import { Given, When, And, Then } from 'cypress-cucumber-preprocessor/steps';
+import {
+  Given,
+  When,
+  And,
+  Then,
+} from 'cypress-cucumber-preprocessor/steps';
 import { generateRandomString } from '../../support/generate-random-string';
 
 let userId = '';
@@ -16,7 +21,9 @@ And('I open Login page', () => {
 });
 
 When('I input a correct username', () => {
-  cy.get("[placeholder='Username']").clear().type(`${userId}@example.com`);
+  cy.get("[placeholder='Username']")
+    .clear()
+    .type(`${userId}@example.com`);
 });
 
 And('I input a correct password', () => {
@@ -24,6 +31,7 @@ And('I input a correct password', () => {
 });
 
 And('I click Login button', () => {
+  cy.wait(10);
   cy.getByE2eId('sign-in').click();
 });
 
@@ -32,13 +40,15 @@ Then('my information is displayed in the header', () => {
 });
 
 And('I input incorrect password', () => {
-  cy.get("[placeholder='Password']").clear().type('111111111').blur();
-});
-
-And('I click Login button', () => {
-  cy.getByE2eId('sign-in').click();
+  cy.get("[placeholder='Password']")
+    .clear()
+    .type('111111111')
+    .blur();
 });
 
 Then('I see an error message', () => {
-  cy.getByE2eId('error').should('contain', 'email or password is invalid');
+  cy.getByE2eId('error').should(
+    'contain',
+    'email or password is invalid',
+  );
 });

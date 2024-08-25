@@ -1,4 +1,9 @@
-import { Given, When, And, Then } from 'cypress-cucumber-preprocessor/steps';
+import {
+  Given,
+  When,
+  And,
+  Then,
+} from 'cypress-cucumber-preprocessor/steps';
 import { generateRandomString } from '../../support/generate-random-string';
 
 let userId = '';
@@ -20,7 +25,9 @@ And('I select the Global feed', () => {
 });
 
 When('I click on the first article', () => {
-  const firstArticle = cy.getByE2eId('article-list-title').first();
+  const firstArticle = cy
+    .getByE2eId('article-list-title')
+    .first();
   firstArticle.then((title) => {
     cy.wrap(title.text().trim()).as('articleTitle');
     title.click();
@@ -30,12 +37,17 @@ When('I click on the first article', () => {
 Then('I navigate to the clicked article', () => {
   cy.get('@articleTitle').then((articleTitle) => {
     cy.url().should('include', `/article/`);
-    cy.getByE2eId('article-title').should('have.text', articleTitle);
+    cy.getByE2eId('article-title').should(
+      'have.text',
+      articleTitle,
+    );
   });
 });
 
 Then('I can see the title of an article', () => {
-  cy.getByE2eId('article-list-title').first().should('not.be.empty');
+  cy.getByE2eId('article-list-title')
+    .first()
+    .should('not.be.empty');
 });
 
 When("I click on the first article's author name", () => {
@@ -50,7 +62,10 @@ When("I click on the first article's author name", () => {
 Then("I navigate to the author's profile page", () => {
   cy.get('@author').then((authorName) => {
     cy.url().should('include', `/profile/`);
-    cy.getByE2eId('article-author-profile').should('have.text', authorName);
+    cy.getByE2eId('article-author-profile').should(
+      'have.text',
+      authorName,
+    );
   });
 });
 
@@ -59,5 +74,7 @@ When('I click on the second page', () => {
 });
 
 Then('I navigate to the second page of the list', () => {
-  cy.getByE2eId('pagination-item').eq(1).should('have.class', 'active');
+  cy.getByE2eId('pagination-item')
+    .eq(1)
+    .should('have.class', 'active');
 });

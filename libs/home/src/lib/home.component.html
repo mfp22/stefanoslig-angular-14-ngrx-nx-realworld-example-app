@@ -13,9 +13,14 @@
           <ul class="nav nav-pills outline-active">
             <li class="nav-item">
               <a
-                [ngClass]="{ active: (listConfig$ | async)?.type === 'FEED' }"
+                [ngClass]="{
+                  active:
+                    articleList.listConfig()?.type === 'FEED'
+                }"
                 class="nav-link"
-                (click)="setListTo('FEED')"
+                (click)="
+                  articleList.listTypeChange$.next('FEED')
+                "
                 >Your Feed</a
               >
             </li>
@@ -23,17 +28,22 @@
               <a
                 data-e2e-id="global-feed"
                 [ngClass]="{
-                  active: (listConfig$ | async)?.type === 'ALL' && !(listConfig$ | async).filters?.tag
+                  active:
+                    articleList.listConfig()?.type === 'ALL' &&
+                    !articleList.listConfig().filters?.tag
                 }"
                 class="nav-link"
-                (click)="setListTo('ALL')"
+                (click)="articleList.listTypeChange$.next('ALL')"
                 >Global Feed</a
               >
             </li>
-            <li class="nav-item" [hidden]="!(listConfig$ | async).filters?.tag">
+            <li
+              class="nav-item"
+              [hidden]="!articleList.listConfig().filters?.tag"
+            >
               <a class="nav-link active">
                 <i class="ion-pound"></i>
-                {{ (listConfig$ | async).filters?.tag }}
+                {{ articleList.listConfig().filters?.tag }}
               </a>
             </li>
           </ul>
@@ -44,7 +54,10 @@
 
       <div class="col-md-3">
         <div class="sidebar">
-          <cdt-tags-list (setListTag)="setListTag($event)" [tags]="tags$ | async"></cdt-tags-list>
+          <cdt-tags-list
+            (setListTag)="articleList.tagChange$.next($event)"
+            [tags]="articleList.tags()"
+          ></cdt-tags-list>
         </div>
       </div>
     </div>

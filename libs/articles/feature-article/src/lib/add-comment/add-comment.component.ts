@@ -1,7 +1,16 @@
 import { Article, User } from '@realworld/core/api-types';
-import { DynamicFormComponent, Field, ListErrorsComponent } from '@realworld/core/forms';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { Observable } from 'rxjs';
+import {
+  DynamicFormComponent,
+  Field,
+  ListErrorsComponent,
+} from '@realworld/core/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 
 @Component({
   selector: 'cdt-add-comment',
@@ -14,9 +23,10 @@ import { Observable } from 'rxjs';
 export class AddCommentComponent {
   @Input() article!: Article;
   @Input() currentUser!: User;
-  @Input() data$!: Observable<any>;
-  @Input() structure$!: Observable<Field[]>;
-  @Input() touchedForm$!: Observable<boolean>;
-  @Output() submitComment: EventEmitter<string> = new EventEmitter();
+  @Input() data: any;
+  @Input() structure: Field[] = [];
+  @Input() touchedForm = false;
+  @Output() submitComment: EventEmitter<string> =
+    new EventEmitter();
   @Output() updateForm: EventEmitter<any> = new EventEmitter();
 }

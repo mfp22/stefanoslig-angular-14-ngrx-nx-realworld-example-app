@@ -1,15 +1,23 @@
 import { inject } from '@angular/core';
-import { ActivatedRouteSnapshot, ResolveFn } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import {
+  ActivatedRouteSnapshot,
+  ResolveFn,
+} from '@angular/router';
+import { filter, map, startWith, take } from 'rxjs';
 
-import { profileActions } from '../+state/profile.actions';
+import { ProfileStateService } from '@realworld/profile/feature-profile/src/lib/profile-state.service';
 
-export const profileResolver: ResolveFn<boolean> = (route: ActivatedRouteSnapshot) => {
-  const username = route.params['username'];
-  const store = inject(Store);
+export const profileResolver: ResolveFn<boolean> = (
+  route: ActivatedRouteSnapshot,
+) => {
+  const profileStateService = inject(ProfileStateService);
 
-  store.dispatch(profileActions.loadProfile({ id: username }));
+  profileStateService.routeParam$.next(route.params['username']);
 
-  return of(true);
+  return profileStateService.connection$.pipe(
+    startWith(null),
+    map(() => !!profileStateService.username()),
+    filter((l) => l),
+    take(1),
+  );
 };

@@ -1,15 +1,21 @@
 <div class="article-page">
   <div class="banner">
     <div class="container">
-      <h1 data-e2e-id="article-title">{{ (article$ | async).title }}</h1>
+      <h1 data-e2e-id="article-title">
+        {{ articleStateService.article()?.title }}
+      </h1>
       <cdt-article-meta
-        [article]="article$ | async"
-        (follow)="follow($event)"
-        (unfollow)="unfollow($event)"
-        (favorite)="favorite($event)"
-        (unfavorite)="unfavorite($event)"
-        (delete)="delete($event)"
-        [canModify]="canModify"
+        [article]="articleStateService.article()"
+        (follow)="articleStateService.follow$.next($event)"
+        (unfollow)="articleStateService.unfollow$.next($event)"
+        (favorite)="articleStateService.favorite$.next($event)"
+        (unfavorite)="
+          articleStateService.unfavorite$.next($event)
+        "
+        (delete)="
+          articleStateService.deleteArticle$.next($event)
+        "
+        [canModify]="canModify()"
       >
       </cdt-article-meta>
     </div>
@@ -18,46 +24,64 @@
   <div class="container page">
     <div class="row article-content">
       <div class="col-md-12">
-        <div [innerHTML]="(article$ | async)?.body | markdown"></div>
+        <div
+          [innerHTML]="
+            articleStateService.article()?.body | markdown
+          "
+        ></div>
       </div>
     </div>
     <hr />
     <div class="article-actions">
       <cdt-article-meta
-        [article]="article$ | async"
-        (follow)="follow($event)"
-        (unfollow)="unfollow($event)"
-        (favorite)="favorite($event)"
-        (unfavorite)="unfavorite($event)"
-        (delete)="delete($event)"
-        [canModify]="canModify"
+        [article]="articleStateService.article()"
+        (follow)="articleStateService.follow$.next($event)"
+        (unfollow)="articleStateService.unfollow$.next($event)"
+        (favorite)="articleStateService.favorite$.next($event)"
+        (unfavorite)="
+          articleStateService.unfavorite$.next($event)
+        "
+        (delete)="
+          articleStateService.deleteArticle$.next($event)
+        "
+        [canModify]="canModify()"
       ></cdt-article-meta>
     </div>
 
     <div class="row">
       <div class="col-xs-12 col-md-8 offset-md-2">
         <cdt-add-comment
-          *ngIf="isAuthenticated$ | async"
-          [article]="article$ | async"
-          [data$]="data$"
-          [structure$]="structure$"
-          [currentUser]="currentUser$ | async"
-          [touchedForm$]="touchedForm$"
-          (submitComment)="submit($event)"
-          (updateForm)="updateForm($event)"
+          *ngIf="authStateService.loggedIn()"
+          [article]="articleStateService.article()"
+          [data]="commentStateService.data()"
+          [structure]="commentStateService.structure()"
+          [currentUser]="authStateService.user()"
+          [touchedForm]="commentStateService.touched()"
+          (submitComment)="
+            commentStateService.addComment$.next({
+              slug: $event,
+              comment: commentStateService.data().comment
+            })
+          "
+          (updateForm)="
+            commentStateService.dataUpdate$.next($event)
+          "
         >
         </cdt-add-comment>
 
-        <div *ngIf="(isAuthenticated$ | async) === false">
-          <a [routerLink]="['/login']">Sign in</a> or <a [routerLink]="['/register']">sign up</a> to add comments on
-          this article.
+        <div *ngIf="authStateService.loggedIn() === false">
+          <a [routerLink]="['/login']">Sign in</a> or
+          <a [routerLink]="['/register']">sign up</a> to add
+          comments on this article.
         </div>
 
         <cdt-article-comment
-          *ngFor="let comment of comments$ | async"
-          [currentUser]="currentUser$ | async"
-          (delete)="deleteComment($event)"
-          [article]="article$ | async"
+          *ngFor="let comment of articleStateService.comments()"
+          [currentUser]="authStateService.user()"
+          (delete)="
+            articleStateService.deleteComment$.next($event)
+          "
+          [article]="articleStateService.article()"
           [comment]="comment"
         ></cdt-article-comment>
       </div>

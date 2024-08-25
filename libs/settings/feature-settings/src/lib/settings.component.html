@@ -4,17 +4,43 @@
       <div class="col-md-6 offset-md-3 col-xs-12">
         <h1 class="text-xs-center">Your Settings</h1>
 
-        <cdt-list-errors></cdt-list-errors>
+        <cdt-list-errors
+          [errors]="settingsStateService.errors()"
+        ></cdt-list-errors>
 
-        <cdt-dynamic-form (updateForm)="updateForm($event)" [data$]="data$" [structure$]="structure$">
+        <cdt-dynamic-form
+          (updateForm)="
+            settingsStateService.dataUpdate$.next($event)
+          "
+          [data]="settingsStateService.data()"
+          [structure]="settingsStateService.structure()"
+        >
         </cdt-dynamic-form>
-        <div class="edit-button-container">
-          <button (click)="submit()" class="btn btn-lg btn-primary pull-xs-right" type="submit">Update Settings</button>
+        <div
+          class="edit-button-container"
+          *ngIf="settingsStateService.data(); let data"
+        >
+          <button
+            (click)="
+              authStateService.userUpdate$.next(
+                settingsStateService.data()
+              )
+            "
+            class="btn btn-lg btn-primary pull-xs-right"
+            type="submit"
+          >
+            Update Settings
+          </button>
         </div>
 
         <hr />
 
-        <button class="btn btn-outline-danger" (click)="logout()">Or click here to logout.</button>
+        <button
+          class="btn btn-outline-danger"
+          (click)="authStateService.logout$.next()"
+        >
+          Or click here to logout.
+        </button>
       </div>
     </div>
   </div>

@@ -3,18 +3,29 @@
     <img [src]="article.author.image" />
   </a>
   <div class="info">
-    <a class="author" [routerLink]="['/profile', article.author.username]">
+    <a
+      class="author"
+      [routerLink]="['/profile', article.author.username]"
+    >
       {{ article.author.username }}
     </a>
-    <span class="date">{{ article.createdAt | date : 'longDate' }}</span>
+    <span class="date">{{
+      article.createdAt | date : 'longDate'
+    }}</span>
   </div>
 
   <span [hidden]="!canModify">
-    <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/editor', article.slug]">
+    <a
+      class="btn btn-sm btn-outline-secondary"
+      [routerLink]="['/editor', article.slug]"
+    >
       <i class="ion-edit"></i> Edit Article
     </a>
 
-    <button class="btn btn-sm btn-outline-danger" (click)="deleteArticle()">
+    <button
+      class="btn btn-sm btn-outline-danger"
+      (click)="deleteArticle()"
+    >
       <i class="ion-trash-a"></i> Delete Article
     </button>
   </span>
@@ -29,7 +40,8 @@
       (click)="toggleFollow()"
     >
       <i class="ion-plus-round"></i>
-      &nbsp; {{ article.author.following ? 'Unfollow' : 'Follow' }}
+      &nbsp;
+      {{ article.author.following ? 'Unfollow' : 'Follow' }}
       {{ article.author.username }}
     </button>
     &nbsp;&nbsp;
@@ -42,7 +54,8 @@
       (click)="toggleFavorite()"
     >
       <i class="ion-heart"></i>
-      &nbsp; {{ article.favorited ? 'Unfavorite' : 'Favorite' }} Post
+      &nbsp;
+      {{ article.favorited ? 'Unfavorite' : 'Favorite' }} Post
       <span class="counter">({{ article.favoritesCount }})</span>
     </button>
   </span>

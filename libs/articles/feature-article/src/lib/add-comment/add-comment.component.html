@@ -4,14 +4,18 @@
   <cdt-dynamic-form
     class="card-block"
     (updateForm)="updateForm.emit($event)"
-    [data$]="data$"
-    [structure$]="structure$"
-    [touchedForm$]="touchedForm$"
+    [data]="data"
+    [structure]="structure"
+    [touchedForm]="touchedForm"
   >
   </cdt-dynamic-form>
   <div class="card-footer">
     <img [src]="currentUser.image" class="comment-author-img" />
-    <button (click)="submitComment.emit(article.slug)" class="btn btn-sm btn-primary" type="submit">
+    <button
+      (click)="submitComment.emit(article.slug)"
+      class="btn btn-sm btn-primary"
+      type="submit"
+    >
       Post Comment
     </button>
   </div>

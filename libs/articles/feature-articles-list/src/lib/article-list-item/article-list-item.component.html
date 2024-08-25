@@ -4,7 +4,11 @@
       <img [src]="article.author.image" />
     </a>
     <div class="info">
-      <a data-e2e-id="article-author" class="author" [routerLink]="['/profile', article.author.username]">
+      <a
+        data-e2e-id="article-author"
+        class="author"
+        [routerLink]="['/profile', article.author.username]"
+      >
         {{ article.author.username }}
       </a>
       <span class="date">
@@ -23,12 +27,18 @@
       <div class="info">{{ article.favoritesCount }}</div>
     </button>
   </div>
-  <a (click)="navigateToArticle.emit(article.slug)" class="preview-link">
+  <a
+    (click)="navigateToArticle.emit(article.slug)"
+    class="preview-link"
+  >
     <h1 data-e2e-id="article-list-title">{{ article.title }}</h1>
     <p>{{ article.description }}</p>
     <span>Read more...</span>
     <ul class="tag-list">
-      <li class="tag-default tag-pill tag-outline" *ngFor="let tag of article.tagList">
+      <li
+        class="tag-default tag-pill tag-outline"
+        *ngFor="let tag of article.tagList"
+      >
         {{ tag }}
       </li>
     </ul>
